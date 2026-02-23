@@ -1,0 +1,39 @@
+{
+  "countries": ["HR", "CZ", "PL", "GR", "IT", "HU", "SK"],
+  "defaultTasks": [
+    "Instagram review",
+    "Facebook review",
+    "Facebook objave",
+    "TikTok objave",
+    "Checker - stran OK",
+    "Checker - Hotjar ideje",
+    "Call center (abandon)",
+    "Call center (stari kupci)",
+    "SMS abandon",
+    "Mailing abandon",
+    "Influencerji",
+    "Upselli na strani",
+    "Jackpot na strani",
+    "Poročilo upselli",
+    "Kampanje vsi paketi",
+    "Trustpilot API",
+    "YouTube oglasi",
+    "Letaki v paketih",
+    "Profit tracking",
+    "Neprevzeti tracking",
+    "CR tracking",
+    "Checkout/nakupi ratio",
+    "Call center report",
+    "Upsell report"
+  ],
+  "assignees": ["Ajda", "Dejan", "Grega", "Petra", "Teja"],
+  "countryData": {
+    "HR": { "tasks": [], "customTasks": [] },
+    "CZ": { "tasks": [], "customTasks": [] },
+    "PL": { "tasks": [], "customTasks": [] },
+    "GR": { "tasks": [], "customTasks": [] },
+    "IT": { "tasks": [], "customTasks": [] },
+    "HU": { "tasks": [], "customTasks": [] },
+    "SK": { "tasks": [], "customTasks": [] }
+  }
+}

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Launches | Noriks</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-icon">🚀</span>
+                    <span class="logo-text">LAUNCHES</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul class="nav-list" id="countryNav">
+                    <!-- Countries will be rendered here -->
+                </ul>
+                <div class="add-country-btn" onclick="showAddCountryModal()">
+                    <i class="fas fa-plus"></i>
+                    <span>Dodaj državo</span>
+                </div>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">N</div>
+                    <div class="user-details">
+                        <span class="user-name">Noriks</span>
+                        <span class="user-role">Launch Tracker</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+        
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="top-bar-left">
+                    <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="page-title">Country Launch Tracker</h1>
+                </div>
+                <div class="top-bar-right">
+                    <div class="current-country" id="currentCountry">
+                        <span class="country-flag" id="countryFlag">🇭🇷</span>
+                        <span class="country-name" id="countryName">HR</span>
+                    </div>
+                </div>
+            </header>
+            
+            <div class="content-wrapper">
+                <!-- Progress Section -->
+                <div class="progress-section">
+                    <div class="progress-info">
+                        <span class="progress-label">Progress</span>
+                        <span class="progress-percent" id="progressPercent">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                    </div>
+                    <div class="progress-stats">
+                        <span id="tasksDone">0</span> / <span id="tasksTotal">0</span> taskov opravljenih
+                    </div>
+                </div>
+                
+                <!-- Tasks Section -->
+                <div class="card tasks-card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-tasks"></i> Taski</h2>
+                    </div>
+                    <div class="tasks-list" id="tasksList">
+                        <!-- Tasks will be rendered here -->
+                    </div>
+                    <div class="add-task-section">
+                        <button class="add-task-btn" onclick="showAddTaskModal()">
+                            <i class="fas fa-plus"></i> Dodaj nov task
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Notes Modal -->
+    <div class="modal-overlay" id="notesModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-sticky-note"></i> Zapiski</h3>
+                <button class="modal-close" onclick="closeNotesModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="task-name-display" id="modalTaskName"></div>
+                <textarea id="notesTextarea" placeholder="Vpiši ideje, izboljšave, komentarje..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeNotesModal()">Prekliči</button>
+                <button class="btn btn-primary" onclick="saveNotes()">Shrani</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Task Modal -->
+    <div class="modal-overlay" id="addTaskModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-plus-circle"></i> Dodaj nov task</h3>
+                <button class="modal-close" onclick="closeAddTaskModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="newTaskName" placeholder="Ime taska..." class="modal-input">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeAddTaskModal()">Prekliči</button>
+                <button class="btn btn-primary" onclick="addNewTask()">Dodaj</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Country Modal -->
+    <div class="modal-overlay" id="addCountryModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-globe"></i> Dodaj novo državo</h3>
+                <button class="modal-close" onclick="closeAddCountryModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="newCountryCode" placeholder="Koda države (npr. RO, BG, RS...)" class="modal-input" maxlength="3">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeAddCountryModal()">Prekliči</button>
+                <button class="btn btn-primary" onclick="addNewCountry()">Dodaj</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>
