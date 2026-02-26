@@ -4,6 +4,10 @@ let currentCountry = 'HR';
 let currentNotesTaskId = null;
 const assignees = ['Ajda', 'Dejan', 'Grega', 'Petra', 'Teja'];
 
+// Base URL for API calls (works behind proxy at /launches/)
+const BASE_URL = window.location.pathname.replace(/\/$/, '').replace(/\/[^\/]*$/, '') || '';
+const API_BASE = BASE_URL.includes('launches') ? '/launches' : '';
+
 // Country flags
 const countryFlags = {
     'HR': '🇭🇷',
@@ -42,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // Load data from server
 async function loadData() {
     try {
-        const response = await fetch('/api/data');
+        const response = await fetch(`${API_BASE}/api/data`);
         appData = await response.json();
         renderCountryNav();
         loadCountry(currentCountry);
@@ -81,7 +85,7 @@ async function loadCountry(code) {
     closeSidebar();
     
     try {
-        const response = await fetch(`/api/country/${code}`);
+        const response = await fetch(`${API_BASE}/api/country/${code}`);
         const data = await response.json();
         renderTasks(data.tasks, data.customTasks);
     } catch (error) {
@@ -148,7 +152,7 @@ async function toggleTask(taskId) {
     const isDone = !checkbox.classList.contains('checked');
     
     try {
-        await fetch(`/api/country/${currentCountry}/task/${taskId}`, {
+        await fetch(`${API_BASE}/api/country/${currentCountry}/task/${taskId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ done: isDone })
@@ -168,7 +172,7 @@ async function toggleTask(taskId) {
 // Update assignee
 async function updateAssignee(taskId, assignee) {
     try {
-        await fetch(`/api/country/${currentCountry}/task/${taskId}`, {
+        await fetch(`${API_BASE}/api/country/${currentCountry}/task/${taskId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ assignee })
@@ -195,7 +199,7 @@ async function saveNotes() {
     const notes = document.getElementById('notesTextarea').value;
     
     try {
-        await fetch(`/api/country/${currentCountry}/task/${currentNotesTaskId}`, {
+        await fetch(`${API_BASE}/api/country/${currentCountry}/task/${currentNotesTaskId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ notes })
@@ -224,7 +228,7 @@ async function addNewTask() {
     if (!name) return;
     
     try {
-        await fetch(`/api/country/${currentCountry}/task`, {
+        await fetch(`${API_BASE}/api/country/${currentCountry}/task`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name })
@@ -242,7 +246,7 @@ async function deleteTask(taskId) {
     if (!confirm('Ali res želiš izbrisati ta task?')) return;
     
     try {
-        await fetch(`/api/country/${currentCountry}/task/${taskId}`, {
+        await fetch(`${API_BASE}/api/country/${currentCountry}/task/${taskId}`, {
             method: 'DELETE'
         });
         
@@ -271,7 +275,7 @@ async function addNewCountry() {
     }
     
     try {
-        const response = await fetch('/api/country', {
+        const response = await fetch(`${API_BASE}/api/country`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ code })

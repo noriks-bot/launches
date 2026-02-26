@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Analyzer - Noriks</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: #0a0a0a; }
+        .video-card { background: #1a1a1a; border: 1px solid #333; }
+        .lang-badge { font-size: 11px; padding: 2px 8px; border-radius: 4px; }
+        .text-item { background: #222; border-left: 3px solid #3b82f6; }
+        .translation-row { background: #1a1a1a; }
+        .spinner { border: 3px solid #333; border-top: 3px solid #3b82f6; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; display: inline-block; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="text-white min-h-screen p-6">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="text-2xl font-bold">🎬 Video Analyzer</h1>
+                <p class="text-gray-500">Gemini AI ekstrahira tekst → lokalizacija v 7 jezikov</p>
+            </div>
+            <a href="/launches/video-upload/" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm">📤 Naloži nov video</a>
+        </div>
+
+        <!-- Video List -->
+        <div id="videoList" class="space-y-4 mb-8">
+            <div class="text-gray-500">Nalagam videe...</div>
+        </div>
+
+        <!-- Analysis Results -->
+        <div id="analysisSection" class="hidden">
+            <div class="flex items-center gap-3 mb-4">
+                <h2 class="text-xl font-semibold">📝 Ekstrahiran tekst</h2>
+                <span id="analysisStatus" class="text-sm text-gray-500"></span>
+            </div>
+            
+            <div id="extractedTexts" class="space-y-6"></div>
+            
+            <div id="translateSection" class="hidden mt-8">
+                <button id="translateAllBtn" class="bg-green-600 hover:bg-green-700 px-6 py-3 rounded-lg font-semibold">
+                    🌍 Prevedi v vse jezike (HR, CZ, PL, GR, IT, HU, SK)
+                </button>
+                
+                <div id="translations" class="mt-6 space-y-4"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const LANGUAGES = [
+            { code: 'HR', name: 'Hrvaščina', flag: '🇭🇷' },
+            { code: 'CZ', name: 'Češčina', flag: '🇨🇿' },
+            { code: 'PL', name: 'Poljščina', flag: '🇵🇱' },
+            { code: 'GR', name: 'Grščina', flag: '🇬🇷' },
+            { code: 'IT', name: 'Italijanščina', flag: '🇮🇹' },
+            { code: 'HU', name: 'Madžarščina', flag: '🇭🇺' },
+            { code: 'SK', name: 'Slovaščina', flag: '🇸🇰' }
+        ];
+        
+        let currentVideo = null;
+        let extractedTexts = [];
+
+        async function loadVideos() {
+            try {
+                const res = await fetch('/launches/api/videos');
+                const videos = await res.json();
+                
+                const container = document.getElementById('videoList');
+                if (videos.length === 0) {
+                    container.innerHTML = '<div class="text-gray-500">Ni naloženih videov. <a href="/launches/video-upload/" class="text-blue-400 hover:underline">Naloži video</a></div>';
+                    return;
+                }
+                
+                container.innerHTML = videos.map(v => `
+                    <div class="video-card rounded-xl p-4 flex items-center gap-4">
+                        <div class="w-48 h-28 bg-black rounded-lg overflow-hidden flex-shrink-0">
+                            <video src="/launches/uploads/${v.filename}" class="w-full h-full object-cover"></video>
+                        </div>
+                        <div class="flex-1">
+                            <div class="font-semibold">${v.filename}</div>
+                            <div class="text-sm text-gray-500">${(v.size / 1024 / 1024).toFixed(1)} MB • ${new Date(v.uploaded).toLocaleString('sl-SI')}</div>
+                        </div>
+                        <button onclick="analyzeVideo('${v.filename}')" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg flex items-center gap-2">
+                            <span>🔍</span> Analiziraj z Gemini
+                        </button>
+                    </div>
+                `).join('');
+            } catch (e) {
+                console.error(e);
+                document.getElementById('videoList').innerHTML = '<div class="text-red-500">Napaka pri nalaganju videov</div>';
+            }
+        }
+
+        async function analyzeVideo(filename) {
+            currentVideo = filename;
+            const section = document.getElementById('analysisSection');
+            const status = document.getElementById('analysisStatus');
+            const textsContainer = document.getElementById('extractedTexts');
+            
+            section.classList.remove('hidden');
+            status.innerHTML = '<span class="spinner"></span> Gemini analizira video...';
+            textsContainer.innerHTML = '';
+            document.getElementById('translateSection').classList.add('hidden');
+            
+            try {
+                const res = await fetch('/launches/api/analyze-video', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ filename })
+                });
+                
+                const data = await res.json();
+                
+                if (data.error) {
+                    status.innerHTML = `<span class="text-red-500">❌ ${data.error}</span>`;
+                    return;
+                }
+                
+                extractedTexts = data.texts || [];
+                status.innerHTML = `<span class="text-green-500">✅ Najdenih ${extractedTexts.length} tekstov</span>`;
+                
+                if (extractedTexts.length === 0) {
+                    textsContainer.innerHTML = '<div class="text-gray-500">V videu ni bilo najdenega teksta.</div>';
+                    return;
+                }
+                
+                textsContainer.innerHTML = extractedTexts.map((t, i) => `
+                    <div class="text-item p-4 rounded-lg">
+                        <div class="flex items-start gap-3">
+                            <span class="bg-blue-600 text-xs px-2 py-1 rounded">${t.timestamp || 'N/A'}</span>
+                            <div class="flex-1">
+                                <div class="font-medium text-lg">${escapeHtml(t.text)}</div>
+                                ${t.context ? `<div class="text-sm text-gray-500 mt-1">${escapeHtml(t.context)}</div>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                
+                document.getElementById('translateSection').classList.remove('hidden');
+                
+            } catch (e) {
+                console.error(e);
+                status.innerHTML = '<span class="text-red-500">❌ Napaka pri analizi</span>';
+            }
+        }
+
+        async function translateAll() {
+            const btn = document.getElementById('translateAllBtn');
+            const container = document.getElementById('translations');
+            
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Prevajam...';
+            container.innerHTML = '';
+            
+            try {
+                const res = await fetch('/launches/api/translate-texts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ texts: extractedTexts, languages: LANGUAGES.map(l => l.code) })
+                });
+                
+                const data = await res.json();
+                
+                if (data.error) {
+                    container.innerHTML = `<div class="text-red-500">❌ ${data.error}</div>`;
+                    return;
+                }
+                
+                // Build translation table
+                let html = '<div class="overflow-x-auto"><table class="w-full text-sm">';
+                html += '<thead><tr class="border-b border-gray-700">';
+                html += '<th class="text-left p-3 text-gray-400">Original</th>';
+                LANGUAGES.forEach(l => {
+                    html += `<th class="text-left p-3 text-gray-400">${l.flag} ${l.code}</th>`;
+                });
+                html += '</tr></thead><tbody>';
+                
+                extractedTexts.forEach((t, i) => {
+                    html += `<tr class="translation-row border-b border-gray-800">`;
+                    html += `<td class="p-3 font-medium">${escapeHtml(t.text)}</td>`;
+                    LANGUAGES.forEach(l => {
+                        const trans = data.translations?.[i]?.[l.code] || '-';
+                        html += `<td class="p-3 text-gray-300">${escapeHtml(trans)}</td>`;
+                    });
+                    html += '</tr>';
+                });
+                
+                html += '</tbody></table></div>';
+                
+                // Add copy/export buttons
+                html += `
+                    <div class="mt-4 flex gap-3">
+                        <button onclick="exportCSV()" class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg text-sm">📋 Izvozi CSV</button>
+                        <button onclick="copyJSON()" class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg text-sm">📄 Kopiraj JSON</button>
+                    </div>
+                `;
+                
+                container.innerHTML = html;
+                window.translationData = data;
+                
+            } catch (e) {
+                console.error(e);
+                container.innerHTML = '<div class="text-red-500">❌ Napaka pri prevajanju</div>';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '🌍 Prevedi v vse jezike (HR, CZ, PL, GR, IT, HU, SK)';
+            }
+        }
+
+        function exportCSV() {
+            if (!window.translationData) return;
+            
+            const data = window.translationData;
+            let csv = 'Original,' + LANGUAGES.map(l => l.code).join(',') + '\n';
+            
+            extractedTexts.forEach((t, i) => {
+                let row = [t.text];
+                LANGUAGES.forEach(l => {
+                    row.push(data.translations?.[i]?.[l.code] || '');
+                });
+                csv += row.map(c => `"${c.replace(/"/g, '""')}"`).join(',') + '\n';
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `translations-${currentVideo}.csv`;
+            a.click();
+        }
+
+        function copyJSON() {
+            if (!window.translationData) return;
+            navigator.clipboard.writeText(JSON.stringify(window.translationData, null, 2));
+            alert('JSON kopiran!');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        document.getElementById('translateAllBtn').onclick = translateAll;
+        loadVideos();
+    </script>
+</body>
+</html>

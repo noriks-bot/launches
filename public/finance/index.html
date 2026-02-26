@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance Dashboard | Noriks</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+            padding: 20px;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        
+        header { 
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        h1 { font-size: 28px; }
+        .header-actions { display: flex; gap: 10px; align-items: center; }
+        
+        .btn {
+            padding: 10px 20px; border-radius: 8px; border: none;
+            background: #6366f1; color: #fff; font-weight: 600; cursor: pointer;
+            transition: all 0.2s; font-size: 14px;
+        }
+        .btn:hover { background: #4f46e5; }
+        .btn-sm { padding: 6px 12px; font-size: 12px; }
+        .btn-success { background: #10b981; }
+        
+        /* Summary Cards */
+        .summary-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px; margin-bottom: 30px;
+        }
+        .card {
+            background: rgba(255,255,255,0.05); border-radius: 12px;
+            padding: 20px; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .card-label { font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 6px; }
+        .card-value { font-size: 28px; font-weight: 700; }
+        .card-sub { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 4px; }
+        .text-yellow { color: #fbbf24; }
+        .text-green { color: #10b981; }
+        .text-red { color: #f87171; }
+        .text-blue { color: #60a5fa; }
+        
+        /* Main Grid */
+        .main-grid {
+            display: grid; grid-template-columns: 2fr 1fr; gap: 20px;
+        }
+        @media (max-width: 1024px) { .main-grid { grid-template-columns: 1fr; } }
+        
+        /* Section */
+        .section {
+            background: rgba(255,255,255,0.05); border-radius: 16px;
+            padding: 24px; border: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+        .section h2 { font-size: 18px; margin-bottom: 20px; }
+        
+        /* Daily Breakdown */
+        .day-row {
+            display: grid; grid-template-columns: 100px 1fr repeat(4, 80px);
+            gap: 10px; padding: 12px; background: rgba(255,255,255,0.03);
+            border-radius: 8px; margin-bottom: 8px; align-items: center;
+        }
+        .day-row:hover { background: rgba(255,255,255,0.06); }
+        .day-row .date { font-weight: 600; }
+        .day-row .country-flags { display: flex; gap: 4px; flex-wrap: wrap; }
+        .day-row .metric { text-align: right; font-size: 14px; }
+        .day-row .metric-label { font-size: 10px; color: rgba(255,255,255,0.5); }
+        
+        /* Country Breakdown */
+        .country-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px; background: rgba(255,255,255,0.03); border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        .country-row .flag { font-size: 24px; margin-right: 10px; }
+        .country-row .info { flex: 1; }
+        .country-row .info .name { font-weight: 600; }
+        .country-row .info .details { font-size: 12px; color: rgba(255,255,255,0.5); }
+        .country-row .amount { font-weight: 700; color: #fbbf24; }
+        
+        /* Costs Section */
+        .cost-row {
+            display: flex; justify-content: space-between; padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .cost-row:last-child { border-bottom: none; }
+        .cost-row.total { font-weight: 700; font-size: 18px; padding-top: 15px; margin-top: 10px; border-top: 2px solid rgba(255,255,255,0.1); }
+        
+        /* Loading */
+        .loading { text-align: center; padding: 40px; color: rgba(255,255,255,0.5); }
+        
+        /* Date picker */
+        input[type="date"] {
+            padding: 10px 15px; border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.1); color: #fff;
+        }
+        
+        /* Settings */
+        .settings-row {
+            display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 15px;
+        }
+        .settings-row .setting {
+            flex: 1; min-width: 150px;
+        }
+        .settings-row label { display: block; font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 5px; }
+        .settings-row input {
+            width: 100%; padding: 8px 12px; border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.05); color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💰 Finance Dashboard</h1>
+            <div class="header-actions">
+                <input type="date" id="selected-date" onchange="loadDailyData()">
+                <button class="btn" onclick="loadAllData()">🔄 Osveži</button>
+            </div>
+        </header>
+        
+        <!-- Summary Cards -->
+        <div class="summary-grid">
+            <div class="card">
+                <div class="card-label">📦 Čakamo odkupnine</div>
+                <div class="card-value text-yellow" id="pending-total">€0</div>
+                <div class="card-sub"><span id="pending-count">0</span> paketov</div>
+            </div>
+            <div class="card">
+                <div class="card-label">💰 Danes promet</div>
+                <div class="card-value text-green" id="today-revenue">€0</div>
+                <div class="card-sub"><span id="today-orders">0</span> naročil</div>
+            </div>
+            <div class="card">
+                <div class="card-label">📱 FB Spend (mesec)</div>
+                <div class="card-value text-red" id="fb-spend">€0</div>
+                <div class="card-sub">Februar 2026</div>
+            </div>
+            <div class="card">
+                <div class="card-label">💵 Na voljo za robo</div>
+                <div class="card-value text-blue" id="available">€0</div>
+                <div class="card-sub">Po odbitkih</div>
+            </div>
+        </div>
+        
+        <div class="main-grid">
+            <!-- Left Column -->
+            <div>
+                <!-- Daily Breakdown -->
+                <div class="section">
+                    <h2>📅 Izbran dan: <span id="display-date">-</span></h2>
+                    <div id="daily-breakdown">
+                        <div class="loading">Nalagam...</div>
+                    </div>
+                </div>
+                
+                <!-- Pending by Date -->
+                <div class="section">
+                    <h2>⏳ Čakamo odkupnine po datumu pošiljanja</h2>
+                    <div id="pending-by-date">
+                        <div class="loading">Nalagam...</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column -->
+            <div>
+                <!-- Pending by Country -->
+                <div class="section">
+                    <h2>🌍 Čakamo po državah</h2>
+                    <div id="pending-by-country">
+                        <div class="loading">Nalagam...</div>
+                    </div>
+                </div>
+                
+                <!-- Cost Calculator -->
+                <div class="section">
+                    <h2>🧮 Izračun za izbran dan</h2>
+                    <div class="settings-row">
+                        <div class="setting">
+                            <label>Poštnina / paket (€)</label>
+                            <input type="number" id="shipping-cost" value="4.50" step="0.1" onchange="recalculate()">
+                        </div>
+                        <div class="setting">
+                            <label>Rejection rate (%)</label>
+                            <input type="number" id="rejection-rate" value="8" step="0.5" onchange="recalculate()">
+                        </div>
+                    </div>
+                    <div id="cost-breakdown">
+                        <div class="cost-row">
+                            <span>💰 Promet (COD)</span>
+                            <span id="calc-revenue">€0</span>
+                        </div>
+                        <div class="cost-row">
+                            <span>📋 DDV (~23%)</span>
+                            <span class="text-red" id="calc-vat">-€0</span>
+                        </div>
+                        <div class="cost-row">
+                            <span>📦 Poštnina</span>
+                            <span class="text-red" id="calc-shipping">-€0</span>
+                        </div>
+                        <div class="cost-row">
+                            <span>❌ Neprevzeti (~8%)</span>
+                            <span class="text-red" id="calc-rejected">-€0</span>
+                        </div>
+                        <div class="cost-row total">
+                            <span>= Neto od dneva</span>
+                            <span id="calc-net">€0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- VAT Reference -->
+                <div class="section">
+                    <h2>📋 DDV stopnje</h2>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 13px;">
+                        <div>🇭🇷 HR: 25%</div>
+                        <div>🇵🇱 PL: 23%</div>
+                        <div>🇨🇿 CZ: 21%</div>
+                        <div>🇸🇰 SK: 20%</div>
+                        <div>🇭🇺 HU: 27%</div>
+                        <div>🇬🇷 GR: 24%</div>
+                        <div>🇮🇹 IT: 22%</div>
+                        <div>🇸🇮 SI: 22%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const VAT_RATES = { HR: 25, PL: 23, CZ: 21, SK: 20, HU: 27, GR: 24, IT: 22, SI: 22 };
+        const FLAGS = { HR: '🇭🇷', PL: '🇵🇱', CZ: '🇨🇿', SK: '🇸🇰', HU: '🇭🇺', GR: '🇬🇷', IT: '🇮🇹', SI: '🇸🇮' };
+        
+        let dailyData = null;
+        let pendingData = null;
+        let fbSpend = 0;
+        
+        function formatCurrency(amount) {
+            return '€' + Math.round(amount).toLocaleString('sl-SI');
+        }
+        
+        async function loadAllData() {
+            await Promise.all([
+                loadDailyData(),
+                loadPendingData(),
+                loadFbSpend()
+            ]);
+            recalculate();
+        }
+        
+        async function loadDailyData() {
+            const date = document.getElementById('selected-date').value;
+            document.getElementById('display-date').textContent = date;
+            
+            try {
+                const response = await fetch('/launches/api/finance/daily-orders?date=' + date);
+                dailyData = await response.json();
+                
+                if (dailyData.error) {
+                    document.getElementById('daily-breakdown').innerHTML = 
+                        '<div class="loading">Napaka: ' + dailyData.error + '</div>';
+                    return;
+                }
+                
+                document.getElementById('today-revenue').textContent = formatCurrency(dailyData.total_revenue);
+                document.getElementById('today-orders').textContent = dailyData.total_orders;
+                
+                // Render daily breakdown
+                const byCountry = dailyData.by_country;
+                let html = '';
+                
+                for (const [country, data] of Object.entries(byCountry)) {
+                    html += `
+                        <div class="country-row">
+                            <span class="flag">${FLAGS[country] || '🏳️'}</span>
+                            <div class="info">
+                                <div class="name">${country}</div>
+                                <div class="details">${data.orders} naročil (${data.cod} COD, ${data.online} online)</div>
+                            </div>
+                            <div class="amount">${formatCurrency(data.revenue)}</div>
+                        </div>
+                    `;
+                }
+                
+                // Add status breakdown
+                html += '<div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">';
+                html += '<strong style="font-size: 14px;">Statusi:</strong><br>';
+                for (const [status, count] of Object.entries(dailyData.by_status)) {
+                    html += `<span style="margin-right: 15px; font-size: 13px;">${status}: ${count}</span>`;
+                }
+                html += '</div>';
+                
+                document.getElementById('daily-breakdown').innerHTML = html || '<div class="loading">Ni podatkov za ta dan</div>';
+                
+                recalculate();
+                
+            } catch (err) {
+                console.error('Failed to load daily data:', err);
+                document.getElementById('daily-breakdown').innerHTML = 
+                    '<div class="loading">Napaka pri nalaganju</div>';
+            }
+        }
+        
+        async function loadPendingData() {
+            try {
+                const response = await fetch('/launches/api/finance/pending-cod');
+                pendingData = await response.json();
+                
+                document.getElementById('pending-total').textContent = formatCurrency(pendingData.total || 0);
+                document.getElementById('pending-count').textContent = pendingData.count || 0;
+                
+                // By country
+                let countryHtml = '';
+                for (const [country, data] of Object.entries(pendingData.byCountry || {})) {
+                    countryHtml += `
+                        <div class="country-row">
+                            <span class="flag">${FLAGS[country] || '🏳️'}</span>
+                            <div class="info">
+                                <div class="name">${country}</div>
+                                <div class="details">${data.count} paketov</div>
+                            </div>
+                            <div class="amount">${formatCurrency(data.amount)}</div>
+                        </div>
+                    `;
+                }
+                document.getElementById('pending-by-country').innerHTML = countryHtml || '<div class="loading">Ni čakajočih</div>';
+                
+                // By date
+                let dateHtml = '';
+                const sortedDates = Object.entries(pendingData.byDate || {}).sort((a, b) => a[0].localeCompare(b[0]));
+                for (const [date, data] of sortedDates) {
+                    dateHtml += `
+                        <div class="day-row" style="grid-template-columns: 100px 1fr 80px;">
+                            <div class="date">${date}</div>
+                            <div>${data.count} paketov</div>
+                            <div class="metric text-yellow">${formatCurrency(data.amount)}</div>
+                        </div>
+                    `;
+                }
+                document.getElementById('pending-by-date').innerHTML = dateHtml || '<div class="loading">Ni podatkov</div>';
+                
+            } catch (err) {
+                console.error('Failed to load pending data:', err);
+            }
+        }
+        
+        async function loadFbSpend() {
+            try {
+                const period = new Date().toISOString().slice(0, 7);
+                const response = await fetch('/launches/api/finance/fb-spend?period=' + period);
+                const data = await response.json();
+                
+                fbSpend = data.spend || 0;
+                document.getElementById('fb-spend').textContent = formatCurrency(fbSpend);
+                
+            } catch (err) {
+                console.error('Failed to load FB spend:', err);
+            }
+        }
+        
+        function recalculate() {
+            if (!dailyData) return;
+            
+            const shippingCost = parseFloat(document.getElementById('shipping-cost').value) || 4.5;
+            const rejectionRate = (parseFloat(document.getElementById('rejection-rate').value) || 8) / 100;
+            
+            const codRevenue = dailyData.cod_revenue || 0;
+            const codOrders = dailyData.cod_orders || 0;
+            
+            // Calculate weighted average VAT
+            let weightedVat = 0;
+            let totalRev = 0;
+            for (const [country, data] of Object.entries(dailyData.by_country || {})) {
+                const vatRate = (VAT_RATES[country] || 22) / 100;
+                // VAT is included in price: VAT = price * rate / (1 + rate)
+                weightedVat += data.revenue * vatRate / (1 + vatRate);
+                totalRev += data.revenue;
+            }
+            
+            const shipping = codOrders * shippingCost;
+            const rejected = codRevenue * rejectionRate;
+            const net = codRevenue - weightedVat - shipping - rejected;
+            
+            document.getElementById('calc-revenue').textContent = formatCurrency(codRevenue);
+            document.getElementById('calc-vat').textContent = '-' + formatCurrency(weightedVat);
+            document.getElementById('calc-shipping').textContent = '-' + formatCurrency(shipping);
+            document.getElementById('calc-rejected').textContent = '-' + formatCurrency(rejected);
+            document.getElementById('calc-net').textContent = formatCurrency(net);
+            document.getElementById('calc-net').className = net >= 0 ? 'text-green' : 'text-red';
+            
+            // Calculate available for inventory
+            // Pending COD - FB spend - estimated costs
+            const pendingTotal = pendingData?.total || 0;
+            const pendingVat = pendingTotal * 0.23 / 1.23; // Estimate 23% average
+            const pendingShipping = (pendingData?.count || 0) * shippingCost;
+            const pendingRejected = pendingTotal * rejectionRate;
+            const available = pendingTotal - pendingVat - pendingShipping - pendingRejected - (fbSpend / 30); // Daily FB spend
+            
+            document.getElementById('available').textContent = formatCurrency(available);
+            document.getElementById('available').className = 'card-value ' + (available >= 0 ? 'text-green' : 'text-red');
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date().toISOString().slice(0, 10);
+            document.getElementById('selected-date').value = today;
+            loadAllData();
+        });
+    </script>
+</body>
+</html>

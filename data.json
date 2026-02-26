@@ -1,5 +1,13 @@
 {
-  "countries": ["HR", "CZ", "PL", "GR", "IT", "HU", "SK"],
+  "countries": [
+    "HR",
+    "CZ",
+    "PL",
+    "GR",
+    "IT",
+    "HU",
+    "SK"
+  ],
   "defaultTasks": [
     "Instagram review",
     "Facebook review",
@@ -26,14 +34,1613 @@
     "Call center report",
     "Upsell report"
   ],
-  "assignees": ["Ajda", "Dejan", "Grega", "Petra", "Teja"],
+  "assignees": [
+    "Ajda",
+    "Dejan",
+    "Grega",
+    "Petra",
+    "Teja"
+  ],
   "countryData": {
-    "HR": { "tasks": [], "customTasks": [] },
-    "CZ": { "tasks": [], "customTasks": [] },
-    "PL": { "tasks": [], "customTasks": [] },
-    "GR": { "tasks": [], "customTasks": [] },
-    "IT": { "tasks": [], "customTasks": [] },
-    "HU": { "tasks": [], "customTasks": [] },
-    "SK": { "tasks": [], "customTasks": [] }
+    "HR": {
+      "tasks": [
+        {
+          "id": "default-14",
+          "name": "Kampanje vsi paketi",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-17",
+          "name": "Letaki v paketih",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-4",
+          "name": "Checker - stran OK",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "deadline": "",
+          "assignMessage": "",
+          "category": "it"
+        },
+        {
+          "id": "default-11",
+          "name": "Upselli na strani",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "it"
+        },
+        {
+          "id": "default-5",
+          "name": "Checker - Hotjar ideje",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "it"
+        },
+        {
+          "id": "default-12",
+          "name": "Jackpot na strani",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "it"
+        },
+        {
+          "id": "default-15",
+          "name": "Trustpilot API",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "it"
+        },
+        {
+          "id": "default-6",
+          "name": "Call center (abandon)",
+          "done": true,
+          "assignee": "",
+          "notes": "",
+          "category": "support"
+        },
+        {
+          "id": "default-7",
+          "name": "Call center (stari kupci)",
+          "done": true,
+          "assignee": "",
+          "notes": "",
+          "category": "support"
+        },
+        {
+          "id": "default-8",
+          "name": "SMS abandon",
+          "done": true,
+          "assignee": "",
+          "notes": "",
+          "category": "support"
+        },
+        {
+          "id": "default-9",
+          "name": "Mailing abandon",
+          "done": true,
+          "assignee": "",
+          "notes": "",
+          "category": "support"
+        },
+        {
+          "id": "default-22",
+          "name": "Call center report",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "support"
+        },
+        {
+          "id": "default-13",
+          "name": "Poročilo upselli",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        },
+        {
+          "id": "default-18",
+          "name": "Profit tracking",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        },
+        {
+          "id": "default-19",
+          "name": "Neprevzeti tracking",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        },
+        {
+          "id": "default-20",
+          "name": "CR tracking",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        },
+        {
+          "id": "default-21",
+          "name": "Checkout/nakupi ratio",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        },
+        {
+          "id": "default-23",
+          "name": "Upsell report",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        },
+        {
+          "id": "default-0",
+          "name": "Instagram review",
+          "done": false,
+          "assignee": "Ajda",
+          "notes": "",
+          "link": "/launches/social-proof/",
+          "linkLabel": "🎨 Social Proof Generator",
+          "shortNote": "Vsak dan vsaka država po 2. reviewa, ki se potem dodata v highlights določene države. ",
+          "dailyLog": {
+            "2026-02-23": {
+              "done": true,
+              "by": "Petra",
+              "time": "12:21"
+            },
+            "2026-02-22": {
+              "done": true,
+              "by": "Ajda",
+              "time": "14:42"
+            },
+            "2026-02-24": {
+              "done": true,
+              "by": "Ajda",
+              "time": "20:14"
+            }
+          }
+        },
+        {
+          "id": "default-2",
+          "name": "Facebook objave",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "other",
+          "shortNote": "Kar se objavi na instagram se mora sherati tudi na facebook page"
+        },
+        {
+          "id": "default-3",
+          "name": "TikTok objave",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "other",
+          "shortNote": "Vsak dan ena objava"
+        },
+        {
+          "id": "default-1",
+          "name": "Facebook review",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "other"
+        },
+        {
+          "id": "default-16",
+          "name": "YouTube objave",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "other"
+        },
+        {
+          "id": "default-10",
+          "name": "Influencerji",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "other"
+        },
+        {
+          "id": "default-16",
+          "name": "YouTube objave",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "other"
+        },
+        {
+          "id": "default-16",
+          "name": "YouTube objave",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "other"
+        },
+        {
+          "id": "default-16",
+          "name": "YouTube oglasi",
+          "done": false,
+          "assignee": "",
+          "notes": ""
+        }
+      ],
+      "customTasks": [
+        {
+          "id": "custom-1771843614692",
+          "name": "Facebook struktura oglasov",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "isCustom": true,
+          "category": "analytics",
+          "deadline": "",
+          "assignMessage": ""
+        },
+        {
+          "id": "custom-1771843619536",
+          "name": "Marketplaci",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "isCustom": true,
+          "category": "analytics"
+        },
+        {
+          "id": "custom-1771844000970",
+          "name": "Social proof na strani",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "isCustom": true,
+          "category": "analytics"
+        },
+        {
+          "id": "custom-1771843993841",
+          "name": "Lokalizirane kreative",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "isCustom": true,
+          "category": "analytics"
+        },
+        {
+          "id": "custom-1771843584432",
+          "name": "Instagram objave",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "isCustom": true,
+          "category": "other",
+          "shortNote": "Vsak dan ena angleška objava"
+        }
+      ]
+    },
+    "CZ": {
+      "tasks": [
+        {
+          "id": "default-0",
+          "name": "Instagram review",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing",
+          "link": "/launches/social-proof/",
+          "linkLabel": "🎨 Social Proof Generator"
+        },
+        {
+          "id": "default-1",
+          "name": "Facebook review",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-2",
+          "name": "Facebook objave",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-3",
+          "name": "TikTok objave",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-4",
+          "name": "Checker - stran OK",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "it"
+        },
+        {
+          "id": "default-5",
+          "name": "Checker - Hotjar ideje",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "it"
+        },
+        {
+          "id": "default-6",
+          "name": "Call center (abandon)",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "support"
+        },
+        {
+          "id": "default-7",
+          "name": "Call center (stari kupci)",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "support"
+        },
+        {
+          "id": "default-8",
+          "name": "SMS abandon",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "support"
+        },
+        {
+          "id": "default-9",
+          "name": "Mailing abandon",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "support"
+        },
+        {
+          "id": "default-10",
+          "name": "Influencerji",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-11",
+          "name": "Upselli na strani",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "it"
+        },
+        {
+          "id": "default-12",
+          "name": "Jackpot na strani",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "it"
+        },
+        {
+          "id": "default-13",
+          "name": "Poročilo upselli",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        },
+        {
+          "id": "default-14",
+          "name": "Kampanje vsi paketi",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-15",
+          "name": "Trustpilot API",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "it"
+        },
+        {
+          "id": "default-16",
+          "name": "YouTube oglasi",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-17",
+          "name": "Letaki v paketih",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-18",
+          "name": "Profit tracking",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        },
+        {
+          "id": "default-19",
+          "name": "Neprevzeti tracking",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        },
+        {
+          "id": "default-20",
+          "name": "CR tracking",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        },
+        {
+          "id": "default-21",
+          "name": "Checkout/nakupi ratio",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        },
+        {
+          "id": "default-22",
+          "name": "Call center report",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "support"
+        },
+        {
+          "id": "default-23",
+          "name": "Upsell report",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        }
+      ],
+      "customTasks": [
+        {
+          "id": "custom-1771843993841",
+          "name": "Lokalizirane kreative",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "isCustom": true,
+          "category": "other"
+        },
+        {
+          "id": "custom-1771844000970",
+          "name": "Social proof na strani",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "isCustom": true,
+          "category": "other"
+        }
+      ]
+    },
+    "PL": {
+      "tasks": [
+        {
+          "id": "default-0",
+          "name": "Instagram review",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing",
+          "link": "/launches/social-proof/",
+          "linkLabel": "🎨 Social Proof Generator"
+        },
+        {
+          "id": "default-1",
+          "name": "Facebook review",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-2",
+          "name": "Facebook objave",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-3",
+          "name": "TikTok objave",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-4",
+          "name": "Checker - stran OK",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "it"
+        },
+        {
+          "id": "default-5",
+          "name": "Checker - Hotjar ideje",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "it"
+        },
+        {
+          "id": "default-6",
+          "name": "Call center (abandon)",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "support"
+        },
+        {
+          "id": "default-7",
+          "name": "Call center (stari kupci)",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "support"
+        },
+        {
+          "id": "default-8",
+          "name": "SMS abandon",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "support"
+        },
+        {
+          "id": "default-9",
+          "name": "Mailing abandon",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "support"
+        },
+        {
+          "id": "default-10",
+          "name": "Influencerji",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-11",
+          "name": "Upselli na strani",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "it"
+        },
+        {
+          "id": "default-12",
+          "name": "Jackpot na strani",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "it"
+        },
+        {
+          "id": "default-13",
+          "name": "Poročilo upselli",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        },
+        {
+          "id": "default-14",
+          "name": "Kampanje vsi paketi",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-15",
+          "name": "Trustpilot API",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "it"
+        },
+        {
+          "id": "default-16",
+          "name": "YouTube oglasi",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-17",
+          "name": "Letaki v paketih",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-18",
+          "name": "Profit tracking",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        },
+        {
+          "id": "default-19",
+          "name": "Neprevzeti tracking",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        },
+        {
+          "id": "default-20",
+          "name": "CR tracking",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        },
+        {
+          "id": "default-21",
+          "name": "Checkout/nakupi ratio",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        },
+        {
+          "id": "default-22",
+          "name": "Call center report",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "support"
+        },
+        {
+          "id": "default-23",
+          "name": "Upsell report",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        }
+      ],
+      "customTasks": [
+        {
+          "id": "custom-1771843993841",
+          "name": "Lokalizirane kreative",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "isCustom": true,
+          "category": "other"
+        },
+        {
+          "id": "custom-1771844000970",
+          "name": "Social proof na strani",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "isCustom": true,
+          "category": "other"
+        }
+      ]
+    },
+    "GR": {
+      "tasks": [
+        {
+          "id": "default-0",
+          "name": "Instagram review",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing",
+          "link": "/launches/social-proof/",
+          "linkLabel": "🎨 Social Proof Generator"
+        },
+        {
+          "id": "default-1",
+          "name": "Facebook review",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-2",
+          "name": "Facebook objave",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-3",
+          "name": "TikTok objave",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-4",
+          "name": "Checker - stran OK",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "it"
+        },
+        {
+          "id": "default-5",
+          "name": "Checker - Hotjar ideje",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "it"
+        },
+        {
+          "id": "default-6",
+          "name": "Call center (abandon)",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "support"
+        },
+        {
+          "id": "default-7",
+          "name": "Call center (stari kupci)",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "support"
+        },
+        {
+          "id": "default-8",
+          "name": "SMS abandon",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "support"
+        },
+        {
+          "id": "default-9",
+          "name": "Mailing abandon",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "support"
+        },
+        {
+          "id": "default-10",
+          "name": "Influencerji",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-11",
+          "name": "Upselli na strani",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "it"
+        },
+        {
+          "id": "default-12",
+          "name": "Jackpot na strani",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "it"
+        },
+        {
+          "id": "default-13",
+          "name": "Poročilo upselli",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        },
+        {
+          "id": "default-14",
+          "name": "Kampanje vsi paketi",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-15",
+          "name": "Trustpilot API",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "it"
+        },
+        {
+          "id": "default-16",
+          "name": "YouTube oglasi",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-17",
+          "name": "Letaki v paketih",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-18",
+          "name": "Profit tracking",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        },
+        {
+          "id": "default-19",
+          "name": "Neprevzeti tracking",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        },
+        {
+          "id": "default-20",
+          "name": "CR tracking",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        },
+        {
+          "id": "default-21",
+          "name": "Checkout/nakupi ratio",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        },
+        {
+          "id": "default-22",
+          "name": "Call center report",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "support"
+        },
+        {
+          "id": "default-23",
+          "name": "Upsell report",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        }
+      ],
+      "customTasks": [
+        {
+          "id": "custom-1771843993841",
+          "name": "Lokalizirane kreative",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "isCustom": true,
+          "category": "other"
+        },
+        {
+          "id": "custom-1771844000970",
+          "name": "Social proof na strani",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "isCustom": true,
+          "category": "other"
+        }
+      ]
+    },
+    "IT": {
+      "tasks": [
+        {
+          "id": "default-0",
+          "name": "Instagram review",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing",
+          "link": "/launches/social-proof/",
+          "linkLabel": "🎨 Social Proof Generator"
+        },
+        {
+          "id": "default-1",
+          "name": "Facebook review",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-2",
+          "name": "Facebook objave",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-3",
+          "name": "TikTok objave",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-4",
+          "name": "Checker - stran OK",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "it"
+        },
+        {
+          "id": "default-5",
+          "name": "Checker - Hotjar ideje",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "it"
+        },
+        {
+          "id": "default-6",
+          "name": "Call center (abandon)",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "support"
+        },
+        {
+          "id": "default-7",
+          "name": "Call center (stari kupci)",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "support"
+        },
+        {
+          "id": "default-8",
+          "name": "SMS abandon",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "support"
+        },
+        {
+          "id": "default-9",
+          "name": "Mailing abandon",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "support"
+        },
+        {
+          "id": "default-10",
+          "name": "Influencerji",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-11",
+          "name": "Upselli na strani",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "it"
+        },
+        {
+          "id": "default-12",
+          "name": "Jackpot na strani",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "it"
+        },
+        {
+          "id": "default-13",
+          "name": "Poročilo upselli",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        },
+        {
+          "id": "default-14",
+          "name": "Kampanje vsi paketi",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-15",
+          "name": "Trustpilot API",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "it"
+        },
+        {
+          "id": "default-16",
+          "name": "YouTube oglasi",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-17",
+          "name": "Letaki v paketih",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-18",
+          "name": "Profit tracking",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        },
+        {
+          "id": "default-19",
+          "name": "Neprevzeti tracking",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        },
+        {
+          "id": "default-20",
+          "name": "CR tracking",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        },
+        {
+          "id": "default-21",
+          "name": "Checkout/nakupi ratio",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        },
+        {
+          "id": "default-22",
+          "name": "Call center report",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "support"
+        },
+        {
+          "id": "default-23",
+          "name": "Upsell report",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        }
+      ],
+      "customTasks": [
+        {
+          "id": "custom-1771843993841",
+          "name": "Lokalizirane kreative",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "isCustom": true,
+          "category": "other"
+        },
+        {
+          "id": "custom-1771844000970",
+          "name": "Social proof na strani",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "isCustom": true,
+          "category": "other"
+        }
+      ]
+    },
+    "HU": {
+      "tasks": [
+        {
+          "id": "default-0",
+          "name": "Instagram review",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing",
+          "link": "/launches/social-proof/",
+          "linkLabel": "🎨 Social Proof Generator"
+        },
+        {
+          "id": "default-1",
+          "name": "Facebook review",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-2",
+          "name": "Facebook objave",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-3",
+          "name": "TikTok objave",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-4",
+          "name": "Checker - stran OK",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "it"
+        },
+        {
+          "id": "default-5",
+          "name": "Checker - Hotjar ideje",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "it"
+        },
+        {
+          "id": "default-6",
+          "name": "Call center (abandon)",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "support"
+        },
+        {
+          "id": "default-7",
+          "name": "Call center (stari kupci)",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "support"
+        },
+        {
+          "id": "default-8",
+          "name": "SMS abandon",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "support"
+        },
+        {
+          "id": "default-9",
+          "name": "Mailing abandon",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "support"
+        },
+        {
+          "id": "default-10",
+          "name": "Influencerji",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-11",
+          "name": "Upselli na strani",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "it"
+        },
+        {
+          "id": "default-12",
+          "name": "Jackpot na strani",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "it"
+        },
+        {
+          "id": "default-13",
+          "name": "Poročilo upselli",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        },
+        {
+          "id": "default-14",
+          "name": "Kampanje vsi paketi",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-15",
+          "name": "Trustpilot API",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "it"
+        },
+        {
+          "id": "default-16",
+          "name": "YouTube oglasi",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-17",
+          "name": "Letaki v paketih",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-18",
+          "name": "Profit tracking",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        },
+        {
+          "id": "default-19",
+          "name": "Neprevzeti tracking",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        },
+        {
+          "id": "default-20",
+          "name": "CR tracking",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        },
+        {
+          "id": "default-21",
+          "name": "Checkout/nakupi ratio",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        },
+        {
+          "id": "default-22",
+          "name": "Call center report",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "support"
+        },
+        {
+          "id": "default-23",
+          "name": "Upsell report",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        }
+      ],
+      "customTasks": [
+        {
+          "id": "custom-1771843993841",
+          "name": "Lokalizirane kreative",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "isCustom": true,
+          "category": "other"
+        },
+        {
+          "id": "custom-1771844000970",
+          "name": "Social proof na strani",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "isCustom": true,
+          "category": "other"
+        }
+      ]
+    },
+    "SK": {
+      "tasks": [
+        {
+          "id": "default-0",
+          "name": "Instagram review",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing",
+          "link": "/launches/social-proof/",
+          "linkLabel": "🎨 Social Proof Generator"
+        },
+        {
+          "id": "default-1",
+          "name": "Facebook review",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-2",
+          "name": "Facebook objave",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-3",
+          "name": "TikTok objave",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-4",
+          "name": "Checker - stran OK",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "it"
+        },
+        {
+          "id": "default-5",
+          "name": "Checker - Hotjar ideje",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "it"
+        },
+        {
+          "id": "default-6",
+          "name": "Call center (abandon)",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "support"
+        },
+        {
+          "id": "default-7",
+          "name": "Call center (stari kupci)",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "support"
+        },
+        {
+          "id": "default-8",
+          "name": "SMS abandon",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "support"
+        },
+        {
+          "id": "default-9",
+          "name": "Mailing abandon",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "support"
+        },
+        {
+          "id": "default-10",
+          "name": "Influencerji",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-11",
+          "name": "Upselli na strani",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "it"
+        },
+        {
+          "id": "default-12",
+          "name": "Jackpot na strani",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "it"
+        },
+        {
+          "id": "default-13",
+          "name": "Poročilo upselli",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        },
+        {
+          "id": "default-14",
+          "name": "Kampanje vsi paketi",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-15",
+          "name": "Trustpilot API",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "it"
+        },
+        {
+          "id": "default-16",
+          "name": "YouTube oglasi",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-17",
+          "name": "Letaki v paketih",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "marketing"
+        },
+        {
+          "id": "default-18",
+          "name": "Profit tracking",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        },
+        {
+          "id": "default-19",
+          "name": "Neprevzeti tracking",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        },
+        {
+          "id": "default-20",
+          "name": "CR tracking",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        },
+        {
+          "id": "default-21",
+          "name": "Checkout/nakupi ratio",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        },
+        {
+          "id": "default-22",
+          "name": "Call center report",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "support"
+        },
+        {
+          "id": "default-23",
+          "name": "Upsell report",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "analytics"
+        }
+      ],
+      "customTasks": [
+        {
+          "id": "custom-1771843993841",
+          "name": "Lokalizirane kreative",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "isCustom": true,
+          "category": "other"
+        },
+        {
+          "id": "custom-1771844000970",
+          "name": "Social proof na strani",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "isCustom": true,
+          "category": "other"
+        }
+      ]
+    }
   }
 }

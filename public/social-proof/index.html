@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Proof Generator - Noriks</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <style>
+        #preview-container {
+            width: 360px;
+            height: 640px;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            background: #000;
+        }
+        
+        #render-target {
+            width: 1080px;
+            height: 1920px;
+            transform-origin: top left;
+            transform: scale(0.333);
+            position: absolute;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+            display: table;
+        }
+        
+        /* TRUSTPILOT */
+        .trustpilot-bg {
+            background: #000000;
+            width: 1080px;
+            height: 1920px;
+            display: table-cell;
+            vertical-align: middle;
+            text-align: center;
+        }
+        
+        .tp-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 24px 28px;
+            width: 920px;
+            display: inline-block;
+            text-align: left;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+        
+        .tp-header { display: flex; align-items: center; gap: 12px; }
+        .tp-avatar {
+            width: 48px; height: 48px; border-radius: 50%;
+            background: #e8e4d4;
+            font-size: 18px; font-weight: 600; color: #1a1a1a;
+            text-align: center;
+            padding-top: 2px;
+            box-sizing: border-box;
+        }
+        .tp-avatar span {
+        }
+        .tp-name { font-size: 17px; font-weight: 600; color: #1a1a1a; }
+        .tp-meta { font-size: 14px; color: #6b7280; display: flex; align-items: center; gap: 4px; }
+        .tp-meta svg { width: 12px; height: 12px; fill: #6b7280; }
+        .tp-divider { height: 1px; background: #e5e7eb; margin: 16px 0; }
+        .tp-rating-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+        .tp-stars { display: flex; gap: 2px; }
+        .tp-star { width: 26px; height: 26px; background: #00b67a; display: flex; align-items: center; justify-content: center; }
+        .tp-star svg { width: 16px; height: 16px; fill: #fff; }
+        .tp-star.empty { background: #dcdce6; }
+        .tp-date-text { font-size: 14px; color: #6b7280; }
+        .tp-title { font-size: 18px; font-weight: 700; color: #1a1a1a; margin-bottom: 8px; }
+        .tp-body { font-size: 16px; color: #1a1a1a; line-height: 1.5; margin-bottom: 16px; }
+        .tp-exp { font-size: 14px; color: #1a1a1a; }
+        .tp-exp-label { font-weight: 600; }
+        .tp-exp-date { color: #6b7280; }
+        
+        /* FACEBOOK */
+        .facebook-bg {
+            background: linear-gradient(180deg, 
+                #1c1c1c 0%, #2a2a2a 5%, #404040 12%, #5a5a5a 20%,
+                #757575 28%, #909090 36%, #a8a8a8 44%, #bfbfbf 52%,
+                #d4d4d4 60%, #e5e5e5 70%, #efefef 80%, #f5f5f5 90%, #fafafa 100%
+            );
+            width: 1080px;
+            height: 1920px;
+            display: table-cell;
+            vertical-align: middle;
+            text-align: center;
+        }
+        
+        .fb-comment-wrapper {
+            width: 1000px;
+            display: inline-block;
+            text-align: left;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+        .fb-row { display: flex; align-items: flex-start; gap: 10px; }
+        .fb-avatar { 
+            width: 48px; height: 48px; border-radius: 50%; object-fit: cover;
+            filter: blur(0.5px);
+            -webkit-filter: blur(0.5px);
+        }
+        .fb-name { font-size: 16px; font-weight: 600; color: #050505; margin-bottom: 1px; }
+        .fb-text { font-size: 16px; color: #050505; line-height: 1.35; }
+        .fb-actions { display: flex; align-items: center; margin-top: 6px; margin-left: 58px; font-size: 14px; }
+        .fb-time { color: #65676b; }
+        .fb-sep { margin: 0 10px; color: transparent; }
+        .fb-like-btn { color: #1877f2; font-weight: 600; }
+        .fb-reply-btn, .fb-msg-btn { color: #65676b; }
+        .fb-likes-wrap { margin-left: auto; display: flex; align-items: center; gap: 4px; }
+        .fb-like-num { color: #65676b; font-size: 14px; }
+        .fb-like-circle { width: 20px; height: 20px; background: #1877f2; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .fb-like-circle svg { width: 12px; height: 12px; fill: #fff; }
+    </style>
+</head>
+<body class="bg-gray-900 min-h-screen text-white">
+    <div class="container mx-auto px-4 py-8">
+        <div class="flex items-center justify-between mb-8">
+            <h1 class="text-3xl font-bold">🎨 Social Proof Generator</h1>
+            <a href="/launches/" class="text-blue-400 hover:text-blue-300">← Back to Dashboard</a>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="space-y-6">
+                <div class="bg-gray-800 rounded-xl p-6">
+                    <h2 class="text-xl font-semibold mb-4">📝 Review Settings</h2>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2">Style</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button id="styleTP" class="bg-green-600 text-white font-semibold py-3 rounded-lg" onclick="setStyle('trustpilot')">⭐ Trustpilot</button>
+                            <button id="styleFB" class="bg-gray-700 text-white font-semibold py-3 rounded-lg" onclick="setStyle('facebook')">👍 Facebook</button>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2">Country</label>
+                        <select id="country" class="w-full bg-gray-700 rounded-lg px-4 py-3">
+                            <option value="HR">🇭🇷 Croatia (HR)</option>
+                            <option value="CZ">🇨🇿 Czech (CZ)</option>
+                            <option value="PL">🇵🇱 Poland (PL)</option>
+                            <option value="GR">🇬🇷 Greece (GR)</option>
+                            <option value="IT">🇮🇹 Italy (IT)</option>
+                            <option value="HU">🇭🇺 Hungary (HU)</option>
+                            <option value="SK">🇸🇰 Slovakia (SK)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2">Product</label>
+                        <select id="product" class="w-full bg-gray-700 rounded-lg px-4 py-3">
+                            <option value="boxers">🩲 Boxers</option>
+                            <option value="tshirt">👕 T-Shirt</option>
+                            <option value="set">📦 Set</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2">Praise Focus</label>
+                        <select id="praise" class="w-full bg-gray-700 rounded-lg px-4 py-3">
+                            <option value="quality">⭐ Product Quality</option>
+                            <option value="comfort">😊 Comfort</option>
+                            <option value="durability">💪 Durability</option>
+                            <option value="delivery">🚚 Fast Delivery</option>
+                            <option value="value">💰 Price-Performance</option>
+                            <option value="gift">🎁 Gift</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-4" id="starsGroup">
+                        <label class="block text-sm font-medium mb-2">Rating</label>
+                        <select id="stars" class="w-full bg-gray-700 rounded-lg px-4 py-3">
+                            <option value="5">★★★★★ (5)</option>
+                            <option value="4">★★★★☆ (4)</option>
+                        </select>
+                    </div>
+                    
+                    <button id="generateBtn" class="w-full bg-green-600 hover:bg-green-500 font-semibold py-3 rounded-lg">🎲 Generate Review</button>
+                </div>
+                
+                <div class="bg-gray-800 rounded-xl p-6">
+                    <button id="downloadBtn" class="w-full bg-purple-600 hover:bg-purple-500 font-semibold py-4 rounded-lg text-lg">📥 Download PNG (1080×1920)</button>
+                </div>
+            </div>
+            
+            <div>
+                <h2 class="text-xl font-semibold mb-4">📱 Preview</h2>
+                <div id="preview-container">
+                    <div id="render-target">
+                        
+                        <!-- TRUSTPILOT -->
+                        <div id="tpl-trustpilot" class="trustpilot-bg">
+                            <div class="tp-card">
+                                <div class="tp-header">
+                                    <div class="tp-avatar" id="tp-avatar"><span>MH</span></div>
+                                    <div>
+                                        <div class="tp-name" id="tp-name">Marko</div>
+                                        <div class="tp-meta">
+                                            <span id="tp-reviews">3 reviews</span>
+                                            <span>·</span>
+                                            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                                            <span id="tp-country">HR</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tp-divider"></div>
+                                <div class="tp-rating-row">
+                                    <div class="tp-stars" id="tp-stars"></div>
+                                    <div class="tp-date-text" id="tp-date">20 Feb 2026</div>
+                                </div>
+                                <div class="tp-title" id="tp-title">Odlične bokserice!</div>
+                                <div class="tp-body" id="tp-body">Naručio sam NORIKS bokserice i prezadovoljan sam. Materijal je kvalitetan, udobne su cijeli dan. Definitivno preporučujem!</div>
+                                <div class="tp-exp">
+                                    <span class="tp-exp-label">Date of experience:</span> <span class="tp-exp-date" id="tp-exp">20 February 2026</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- FACEBOOK -->
+                        <div id="tpl-facebook" class="facebook-bg" style="display:none;">
+                            <div class="fb-comment-wrapper">
+                                <div class="fb-row">
+                                    <img class="fb-avatar" id="fb-avatar" src="/launches/api/image-proxy?url=https%3A%2F%2Frandomuser.me%2Fapi%2Fportraits%2Fmen%2F32.jpg">
+                                    <div>
+                                        <div class="fb-name" id="fb-name">Luka Babić</div>
+                                        <div class="fb-text" id="fb-text">NORIKS bokserice su najbolje koje sam ikad imao. Ne gube oblik nakon pranja!</div>
+                                    </div>
+                                </div>
+                                <div class="fb-actions">
+                                    <span class="fb-time" id="fb-time">2h</span>
+                                    <span class="fb-sep">·</span>
+                                    <span class="fb-like-btn">Like</span>
+                                    <span class="fb-sep">·</span>
+                                    <span class="fb-reply-btn">Reply</span>
+                                    <span class="fb-sep">·</span>
+                                    <span class="fb-msg-btn">Message</span>
+                                    <div class="fb-likes-wrap">
+                                        <span class="fb-like-num" id="fb-likes">1</span>
+                                        <div class="fb-like-circle">
+                                            <svg viewBox="0 0 16 16"><path d="M8.864.046C7.908-.193 7.02.53 6.956 1.466c-.072 1.051-.23 2.016-.428 2.59-.125.36-.479 1.013-1.04 1.639-.557.623-1.282 1.178-2.131 1.41C2.685 7.288 2 7.87 2 8.72v4.001c0 .845.682 1.464 1.448 1.545 1.07.114 1.564.415 2.068.723l.048.03c.272.165.578.348.97.484.397.136.861.217 1.466.217h3.5c.937 0 1.599-.477 1.934-1.064a1.86 1.86 0 0 0 .254-.912c0-.152-.023-.312-.077-.464.201-.263.38-.578.488-.901.11-.33.172-.762.004-1.149.069-.13.12-.269.159-.403.077-.27.113-.568.113-.857 0-.288-.036-.585-.113-.856a2.144 2.144 0 0 0-.138-.362 1.9 1.9 0 0 0 .234-1.734c-.206-.592-.682-1.1-1.2-1.272-.847-.282-1.803-.276-2.516-.211a9.84 9.84 0 0 0-.443.05 9.365 9.365 0 0 0-.062-4.509A1.38 1.38 0 0 0 8.864.046z"/></svg>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentStyle = 'trustpilot';
+        const usedNames = new Set(); // Track used names to never repeat
+        
+        // Large name pools - MALE first names (products are for men)
+        const MALE_FIRST_NAMES = {
+            HR: ['Marko', 'Ivan', 'Luka', 'Ante', 'Josip', 'Tomislav', 'Dario', 'Matej', 'Filip', 'Petar', 'Nikola', 'Hrvoje', 'Mario', 'Davor', 'Goran', 'Zoran', 'Boris', 'Vedran', 'Domagoj', 'Karlo', 'Bruno', 'Antonio', 'Stjepan', 'Marin', 'Lovro'],
+            CZ: ['Jan', 'Petr', 'Tomáš', 'Martin', 'Jakub', 'Pavel', 'David', 'Lukáš', 'Ondřej', 'Marek', 'Michal', 'Josef', 'Jiří', 'Adam', 'Filip', 'Vojtěch', 'Daniel', 'Radek', 'Karel', 'Miroslav'],
+            PL: ['Piotr', 'Krzysztof', 'Andrzej', 'Tomasz', 'Jan', 'Paweł', 'Michał', 'Marcin', 'Adam', 'Jakub', 'Mateusz', 'Łukasz', 'Kamil', 'Robert', 'Grzegorz', 'Marek', 'Wojciech', 'Rafał', 'Damian', 'Przemysław'],
+            GR: ['Γιώργος', 'Νίκος', 'Δημήτρης', 'Κώστας', 'Γιάννης', 'Αλέξανδρος', 'Μιχάλης', 'Παναγιώτης', 'Βασίλης', 'Χρήστος', 'Σταύρος', 'Αντώνης', 'Θάνος', 'Πέτρος', 'Στέφανος'],
+            IT: ['Marco', 'Giuseppe', 'Luca', 'Francesco', 'Alessandro', 'Andrea', 'Matteo', 'Lorenzo', 'Davide', 'Simone', 'Federico', 'Riccardo', 'Fabio', 'Stefano', 'Paolo', 'Giovanni', 'Antonio', 'Roberto', 'Massimo', 'Nicola'],
+            HU: ['Péter', 'Tamás', 'Gábor', 'László', 'István', 'Zoltán', 'János', 'Ádám', 'Balázs', 'Dániel', 'Attila', 'Csaba', 'Ferenc', 'Sándor', 'Márk', 'Bence', 'Norbert', 'Tibor', 'Levente', 'Krisztián'],
+            SK: ['Ján', 'Peter', 'Martin', 'Tomáš', 'Michal', 'Marek', 'Lukáš', 'Jakub', 'Pavol', 'Ondrej', 'Štefan', 'Jozef', 'Rastislav', 'Milan', 'Richard', 'Dušan', 'Roman', 'Matúš', 'Filip', 'Daniel']
+        };
+        
+        // FEMALE first names (for gift purchases)
+        const FEMALE_FIRST_NAMES = {
+            HR: ['Ana', 'Marija', 'Ivana', 'Petra', 'Maja', 'Lucija', 'Marina', 'Katarina', 'Martina', 'Nikolina', 'Tea', 'Sara', 'Iva', 'Valentina', 'Karla'],
+            CZ: ['Jana', 'Tereza', 'Kateřina', 'Lucie', 'Petra', 'Markéta', 'Eva', 'Anna', 'Michaela', 'Veronika', 'Barbora', 'Kristýna', 'Nikola', 'Lenka', 'Simona'],
+            PL: ['Anna', 'Maria', 'Katarzyna', 'Agnieszka', 'Magdalena', 'Joanna', 'Monika', 'Aleksandra', 'Natalia', 'Karolina', 'Patrycja', 'Marta', 'Paulina', 'Justyna', 'Ewa'],
+            GR: ['Μαρία', 'Ελένη', 'Κατερίνα', 'Σοφία', 'Αναστασία', 'Δήμητρα', 'Γεωργία', 'Ιωάννα', 'Χριστίνα', 'Αγγελική', 'Ευαγγελία', 'Νίκη', 'Θεοδώρα', 'Άννα', 'Ειρήνη'],
+            IT: ['Giulia', 'Francesca', 'Sara', 'Chiara', 'Valentina', 'Alessia', 'Martina', 'Federica', 'Elisa', 'Silvia', 'Laura', 'Giorgia', 'Ilaria', 'Anna', 'Roberta'],
+            HU: ['Zsófia', 'Anna', 'Kata', 'Eszter', 'Réka', 'Petra', 'Viktória', 'Dóra', 'Nikolett', 'Adrienn', 'Boglárka', 'Fanni', 'Kinga', 'Nóra', 'Vivien'],
+            SK: ['Mária', 'Anna', 'Eva', 'Zuzana', 'Katarína', 'Petra', 'Jana', 'Martina', 'Michaela', 'Lucia', 'Veronika', 'Lenka', 'Simona', 'Monika', 'Ivana']
+        };
+        
+        const LAST_NAMES = {
+            HR: ['Horvat', 'Kovačević', 'Babić', 'Jurić', 'Novak', 'Perić', 'Matić', 'Knežević', 'Šarić', 'Radić', 'Marić', 'Kovač', 'Tomić', 'Božić', 'Pavlović', 'Vuković', 'Filipović', 'Blažević', 'Grgić', 'Barić', 'Bošnjak', 'Katić', 'Vidović', 'Rukavina', 'Bilić'],
+            CZ: ['Novák', 'Svoboda', 'Dvořák', 'Černý', 'Procházka', 'Kučera', 'Veselý', 'Horák', 'Marek', 'Pokorný', 'Jelínek', 'Sedláček', 'Král', 'Růžička', 'Beneš', 'Fiala', 'Šimek', 'Kolář', 'Navrátil', 'Urban'],
+            PL: ['Kowalski', 'Wiśniewski', 'Wójcik', 'Kamiński', 'Lewandowski', 'Zieliński', 'Szymański', 'Woźniak', 'Dąbrowski', 'Kozłowski', 'Jankowski', 'Mazur', 'Kwiatkowski', 'Krawczyk', 'Piotrowski', 'Grabowski', 'Nowakowski', 'Pawłowski', 'Michalski', 'Adamczyk'],
+            GR: ['Παπαδόπουλος', 'Κωνσταντίνου', 'Αντωνίου', 'Νικολάου', 'Γεωργίου', 'Βασιλείου', 'Δημητρίου', 'Ιωάννου', 'Παπαδάκης', 'Αλεξίου', 'Οικονόμου', 'Σταματίου', 'Χριστοδούλου', 'Καραγιάννης', 'Μακρής'],
+            IT: ['Rossi', 'Russo', 'Bianchi', 'Ferrari', 'Esposito', 'Romano', 'Colombo', 'Ricci', 'Marino', 'Greco', 'Bruno', 'Gallo', 'Conti', 'De Luca', 'Mancini', 'Costa', 'Giordano', 'Rizzo', 'Lombardi', 'Moretti'],
+            HU: ['Kovács', 'Nagy', 'Szabó', 'Tóth', 'Horváth', 'Varga', 'Kiss', 'Molnár', 'Németh', 'Farkas', 'Balogh', 'Papp', 'Takács', 'Juhász', 'Lakatos', 'Mészáros', 'Oláh', 'Simon', 'Rácz', 'Fekete'],
+            SK: ['Horváth', 'Kováč', 'Nagy', 'Baláž', 'Szabó', 'Tóth', 'Varga', 'Kiss', 'Molnár', 'Németh', 'Lukáč', 'Kováčik', 'Balog', 'Oravec', 'Kollár', 'Krajčí', 'Polák', 'Šimko', 'Čech', 'Moravčík']
+        };
+        
+        function setStyle(s) {
+            currentStyle = s;
+            document.getElementById('styleTP').className = s === 'trustpilot' ? 'bg-green-600 text-white font-semibold py-3 rounded-lg' : 'bg-gray-700 text-white font-semibold py-3 rounded-lg';
+            document.getElementById('styleFB').className = s === 'facebook' ? 'bg-blue-600 text-white font-semibold py-3 rounded-lg' : 'bg-gray-700 text-white font-semibold py-3 rounded-lg';
+            document.getElementById('tpl-trustpilot').style.display = s === 'trustpilot' ? 'table-cell' : 'none';
+            document.getElementById('tpl-facebook').style.display = s === 'facebook' ? 'table-cell' : 'none';
+            document.getElementById('starsGroup').style.display = s === 'trustpilot' ? 'block' : 'none';
+        }
+        
+        function getUniqueName(country, isGift) {
+            // Gift = female buying for partner, otherwise = male buying for himself
+            const firsts = isGift ? FEMALE_FIRST_NAMES[country] : MALE_FIRST_NAMES[country];
+            const lasts = LAST_NAMES[country];
+            let name, attempts = 0;
+            
+            do {
+                const first = firsts[Math.floor(Math.random() * firsts.length)];
+                const last = lasts[Math.floor(Math.random() * lasts.length)];
+                name = `${first} ${last}`;
+                attempts++;
+                if (attempts > 100) {
+                    name = `${first} ${last}${Math.floor(Math.random() * 99)}`;
+                    break;
+                }
+            } while (usedNames.has(name));
+            
+            usedNames.add(name);
+            return name;
+        }
+        
+        function initials(n) { 
+            const p = n.split(' '); 
+            return p.length >= 2 ? (p[0][0] + p[1][0]).toUpperCase() : n.slice(0,2).toUpperCase(); 
+        }
+        
+        function freshDate() {
+            const now = new Date();
+            const daysAgo = Math.floor(Math.random() * 7) + 1;
+            const d = new Date(now - daysAgo * 86400000);
+            const mo = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            const moF = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+            return { short: `${d.getDate()} ${mo[d.getMonth()]} ${d.getFullYear()}`, full: `${d.getDate()} ${moF[d.getMonth()]} ${d.getFullYear()}` };
+        }
+        
+        function fbTime() {
+            return ['1h','2h','3h','4h','5h','6h','8h','12h','1d','2d','3d'][Math.floor(Math.random() * 11)];
+        }
+        
+        function stars(n) {
+            let h = '';
+            for (let i = 0; i < 5; i++) {
+                h += `<div class="tp-star${i >= n ? ' empty' : ''}"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>`;
+            }
+            return h;
+        }
+        
+        async function generate() {
+            const country = document.getElementById('country').value;
+            const product = document.getElementById('product').value;
+            const praise = document.getElementById('praise').value;
+            const starCount = +document.getElementById('stars').value;
+            
+            const isGift = praise === 'gift';
+            const name = getUniqueName(country, isGift);
+            const firstName = name.split(' ')[0];
+            const revCount = Math.floor(Math.random() * 7) + 1;
+            const date = freshDate();
+            
+            if (currentStyle === 'trustpilot') {
+                document.getElementById('tp-avatar').innerHTML = '<span>' + initials(name) + '</span>';
+                document.getElementById('tp-name').textContent = firstName;
+                document.getElementById('tp-reviews').textContent = revCount + ' review' + (revCount > 1 ? 's' : '');
+                document.getElementById('tp-country').textContent = country;
+                document.getElementById('tp-date').textContent = date.short;
+                document.getElementById('tp-exp').textContent = date.full;
+                document.getElementById('tp-stars').innerHTML = stars(starCount);
+            } else {
+                // Use random face photo - gender based on isGift
+                const gender = isGift ? 'female' : 'male';
+                // Map countries to similar randomuser.me nationalities
+                const natMap = { HR: 'de', CZ: 'de', PL: 'de', GR: 'es', IT: 'es', HU: 'de', SK: 'de' };
+                const nat = natMap[country] || 'de';
+                const randomSeed = Date.now() + Math.random();
+                document.getElementById('fb-avatar').src = `/launches/api/image-proxy?url=${encodeURIComponent(`https://randomuser.me/api/portraits/${gender === 'male' ? 'men' : 'women'}/${Math.floor(Math.random() * 99)}.jpg`)}`;
+                document.getElementById('fb-name').textContent = name;
+                document.getElementById('fb-time').textContent = fbTime();
+                document.getElementById('fb-likes').textContent = Math.floor(Math.random() * 8) + 1;
+            }
+            
+            document.getElementById('generateBtn').textContent = '⏳ Generating...';
+            document.getElementById('generateBtn').disabled = true;
+            
+            try {
+                const res = await fetch('/launches/api/generate-review', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ country, product, praise, stars: starCount, style: currentStyle, isGift })
+                });
+                const data = await res.json();
+                
+                if (currentStyle === 'trustpilot') {
+                    if (data.title) document.getElementById('tp-title').textContent = data.title;
+                    if (data.body) document.getElementById('tp-body').textContent = data.body;
+                } else {
+                    if (data.body) document.getElementById('fb-text').textContent = data.body;
+                }
+            } catch (e) { console.error(e); }
+            
+            document.getElementById('generateBtn').textContent = '🎲 Generate Review';
+            document.getElementById('generateBtn').disabled = false;
+        }
+        
+        async function download() {
+            const btn = document.getElementById('downloadBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Generiram...';
+            
+            try {
+                // Create a fresh container for rendering
+                const container = document.createElement('div');
+                container.style.cssText = 'position:fixed;top:0;left:0;width:1080px;height:1920px;z-index:99999;background:#000;';
+                document.body.appendChild(container);
+                
+                // Clone the current template content
+                const bg = currentStyle === 'trustpilot'
+                    ? document.getElementById('tpl-trustpilot')
+                    : document.getElementById('tpl-facebook');
+                
+                const clone = bg.cloneNode(true);
+                clone.style.cssText = `
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    width: 1080px !important;
+                    height: 1920px !important;
+                    background: ${currentStyle === 'trustpilot' ? '#000000' : 'linear-gradient(180deg, #1c1c1c 0%, #2a2a2a 5%, #404040 12%, #5a5a5a 20%, #757575 28%, #909090 36%, #a8a8a8 44%, #bfbfbf 52%, #d4d4d4 60%, #e5e5e5 70%, #efefef 80%, #f5f5f5 90%, #fafafa 100%)'} !important;
+                `;
+                container.appendChild(clone);
+                
+                // Wait for render
+                await new Promise(r => setTimeout(r, 200));
+                
+                // Capture
+                const canvas = await html2canvas(container, { 
+                    width: 1080, 
+                    height: 1920, 
+                    scale: 1, 
+                    useCORS: true, 
+                    allowTaint: true,
+                    backgroundColor: currentStyle === 'trustpilot' ? '#000000' : null
+                });
+                
+                // Download
+                const a = document.createElement('a');
+                a.download = `noriks-${currentStyle}-${document.getElementById('country').value}-${Date.now()}.png`;
+                a.href = canvas.toDataURL('image/png');
+                a.click();
+                
+                // Cleanup
+                document.body.removeChild(container);
+                
+            } catch (e) { 
+                console.error('Download error:', e); 
+                alert('Napaka: ' + e.message);
+            }
+            
+            btn.disabled = false;
+            btn.textContent = '📥 Download PNG (1080x1920)';
+        }
+        
+        document.getElementById('generateBtn').onclick = generate;
+        document.getElementById('downloadBtn').onclick = download;
+        document.getElementById('tp-stars').innerHTML = stars(5);
+    </script>
+</body>
+</html>

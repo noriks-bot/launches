@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pakiranje | NORIKS</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: #1a1a1a;
+            color: #fff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .header h1 span { color: #10b981; }
+        
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #10b981;
+            color: #fff;
+        }
+        
+        .btn-primary:hover { background: #059669; }
+        
+        .btn-secondary {
+            background: #333;
+            color: #fff;
+        }
+        
+        .btn-secondary:hover { background: #444; }
+        
+        .stats {
+            display: flex;
+            gap: 20px;
+            color: #888;
+            font-size: 14px;
+        }
+        
+        .stats span { color: #10b981; font-weight: 600; }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .filters {
+            background: #fff;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .filters label {
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .country-buttons {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        
+        .country-btn {
+            padding: 6px 14px;
+            border: 2px solid #ddd;
+            border-radius: 20px;
+            background: #fff;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .country-btn:hover { border-color: #10b981; }
+        
+        .country-btn.active {
+            background: #10b981;
+            color: #fff;
+            border-color: #10b981;
+        }
+        
+        .order-price {
+            font-size: 16px;
+            font-weight: 700;
+            color: #10b981;
+        }
+        
+        .order-price-eur {
+            font-size: 12px;
+            color: #888;
+            font-weight: 400;
+        }
+        
+        .filters select, .filters input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .order-card {
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            page-break-inside: avoid;
+        }
+        
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .customer-name {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+        
+        .order-meta {
+            text-align: right;
+            font-size: 13px;
+            color: #888;
+        }
+        
+        .order-id {
+            font-weight: 600;
+            color: #10b981;
+        }
+        
+        .items-list {
+            list-style: none;
+        }
+        
+        .item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f5f5f5;
+            font-size: 16px;
+        }
+        
+        .item:last-child { border-bottom: none; }
+        
+        .item-checkbox {
+            width: 24px;
+            height: 24px;
+            margin-right: 15px;
+            cursor: pointer;
+        }
+        
+        .item-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 12px;
+            border: 2px solid #ddd;
+        }
+        
+        .item-name {
+            flex: 1;
+            font-weight: 500;
+        }
+        
+        .item-size {
+            background: #f0f0f0;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #888;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #f0f0f0;
+            border-top-color: #10b981;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #888;
+        }
+        
+        .empty-state h3 { color: #333; margin-bottom: 10px; }
+        
+        /* Print styles */
+        @media print {
+            .header, .filters, .btn, .item-checkbox, .no-print { display: none !important; }
+            body { background: #fff; }
+            .container { max-width: 100%; padding: 0; }
+            .order-card { 
+                box-shadow: none; 
+                border: 1px solid #ddd;
+                margin-bottom: 20px;
+            }
+            .item { font-size: 14px; }
+            .customer-name { font-size: 18px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📦 <span>Pakiranje</span> | NORIKS</h1>
+        <div class="header-actions">
+            <div class="stats">
+                <div>Naročil: <span id="order-count">-</span></div>
+                <div>Artiklov: <span id="item-count">-</span></div>
+            </div>
+            <button class="btn btn-secondary" onclick="refreshOrders()">🔄 Osveži</button>
+            <button class="btn btn-primary" onclick="window.print()">🖨️ Natisni</button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="filters no-print">
+            <label>
+                Datum:
+                <input type="date" id="filter-date" onchange="refreshOrders()">
+            </label>
+            <label>
+                Status:
+                <select id="filter-status" onchange="refreshOrders()">
+                    <option value="Odpremljen" selected>Odpremljen</option>
+                    <option value="Pripravljen za odpremo">Pripravljen za odpremo</option>
+                    <option value="Novo">Novo</option>
+                </select>
+            </label>
+            <div class="country-buttons" id="country-buttons">
+                <button class="country-btn active" data-country="" onclick="selectCountry(this)">Vse</button>
+                <button class="country-btn" data-country="Croatia" onclick="selectCountry(this)">🇭🇷</button>
+                <button class="country-btn" data-country="Czech Republic" onclick="selectCountry(this)">🇨🇿</button>
+                <button class="country-btn" data-country="Poland" onclick="selectCountry(this)">🇵🇱</button>
+                <button class="country-btn" data-country="Slovakia" onclick="selectCountry(this)">🇸🇰</button>
+                <button class="country-btn" data-country="Hungary" onclick="selectCountry(this)">🇭🇺</button>
+                <button class="country-btn" data-country="Greece" onclick="selectCountry(this)">🇬🇷</button>
+                <button class="country-btn" data-country="Italy" onclick="selectCountry(this)">🇮🇹</button>
+            </div>
+            <label>
+                <input type="checkbox" id="filter-today" checked onchange="toggleDateFilter()">
+                Samo danes
+            </label>
+        </div>
+        
+        <div id="orders-container">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <p>Nalagam naročila...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Approximate exchange rates to EUR
+        const toEurRates = {
+            'EUR': 1,
+            'CZK': 0.04,    // ~25 CZK = 1 EUR
+            'PLN': 0.23,    // ~4.3 PLN = 1 EUR
+            'HUF': 0.0025,  // ~400 HUF = 1 EUR
+        };
+        
+        const currencySymbols = {
+            'EUR': '€', 'CZK': 'Kč', 'PLN': 'zł', 'HUF': 'Ft'
+        };
+        
+        let selectedCountry = '';
+        
+        function selectCountry(btn) {
+            document.querySelectorAll('.country-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedCountry = btn.dataset.country;
+            filterByCountry();
+        }
+        
+        // Color translations to Slovenian
+        const colorTranslations = {
+            // Czech
+            'modrá': 'Modra', 'modra': 'Modra',
+            'zelená': 'Zelena', 'zelena': 'Zelena',
+            'červená': 'Rdeča', 'cervena': 'Rdeča',
+            'čierna': 'Črna', 'cierna': 'Črna', 'černá': 'Črna', 'cerna': 'Črna',
+            'biela': 'Bela', 'bílá': 'Bela', 'bila': 'Bela',
+            'šedá': 'Siva', 'seda': 'Siva', 'sivá': 'Siva',
+            'hnedá': 'Rjava', 'hneda': 'Rjava',
+            'béžová': 'Bež', 'bezova': 'Bež',
+            'fialová': 'Vijolična', 'fialova': 'Vijolična',
+            'oranžová': 'Oranžna', 'oranzova': 'Oranžna',
+            'růžová': 'Roza', 'ruzova': 'Roza',
+            'žlutá': 'Rumena', 'zluta': 'Rumena',
+            'tyrkysová': 'Turkizna', 'tyrkysova': 'Turkizna',
+            'tmavomodrá': 'Temno modra', 'tmavomodra': 'Temno modra',
+            'svetlomodrá': 'Svetlo modra', 'svetlomodra': 'Svetlo modra',
+            
+            // Polish
+            'czarny': 'Črna', 'czarna': 'Črna',
+            'niebieski': 'Modra', 'niebieska': 'Modra',
+            'szary': 'Siva', 'szara': 'Siva',
+            'zielony': 'Zelena', 'zielona': 'Zelena',
+            'czerwony': 'Rdeča', 'czerwona': 'Rdeča',
+            'biały': 'Bela', 'bialy': 'Bela', 'biała': 'Bela', 'biala': 'Bela',
+            'brązowy': 'Rjava', 'brazowy': 'Rjava',
+            'beżowy': 'Bež', 'bezowy': 'Bež',
+            'różowy': 'Roza', 'rozowy': 'Roza',
+            'pomarańczowy': 'Oranžna', 'pomaranczowy': 'Oranžna',
+            'fioletowy': 'Vijolična',
+            'żółty': 'Rumena', 'zolty': 'Rumena',
+            'granatowy': 'Temno modra',
+            'turkusowy': 'Turkizna',
+            
+            // Croatian/Serbian
+            'crna': 'Črna', 'crno': 'Črna',
+            'plava': 'Modra', 'plavo': 'Modra',
+            'bijela': 'Bela', 'bijelo': 'Bela',
+            'siva': 'Siva', 'sivo': 'Siva',
+            'crvena': 'Rdeča', 'crveno': 'Rdeča',
+            'smeđa': 'Rjava', 'smeda': 'Rjava', 'smeđo': 'Rjava',
+            'bez': 'Bež',
+            'roza': 'Roza',
+            'narančasta': 'Oranžna', 'narancasta': 'Oranžna',
+            'ljubičasta': 'Vijolična', 'ljubicasta': 'Vijolična',
+            'žuta': 'Rumena', 'zuta': 'Rumena',
+            'tirkizna': 'Turkizna',
+            'tamno plava': 'Temno modra',
+            
+            // Hungarian
+            'fekete': 'Črna',
+            'kék': 'Modra', 'kek': 'Modra',
+            'fehér': 'Bela', 'feher': 'Bela',
+            'szürke': 'Siva', 'szurke': 'Siva',
+            'piros': 'Rdeča',
+            'zöld': 'Zelena', 'zold': 'Zelena',
+            'barna': 'Rjava',
+            'bézs': 'Bež', 'bezs': 'Bež',
+            'rózsaszín': 'Roza', 'rozsaszin': 'Roza',
+            'narancssárga': 'Oranžna', 'narancssarga': 'Oranžna',
+            'lila': 'Vijolična',
+            'sárga': 'Rumena', 'sarga': 'Rumena',
+            'türkiz': 'Turkizna', 'turkiz': 'Turkizna',
+            'sötétkék': 'Temno modra', 'sotetkek': 'Temno modra',
+            
+            // Greek (transliterated)
+            'mavro': 'Črna', 'μαύρο': 'Črna',
+            'ble': 'Modra', 'μπλε': 'Modra',
+            'aspro': 'Bela', 'άσπρο': 'Bela', 'lefko': 'Bela',
+            'gkri': 'Siva', 'γκρι': 'Siva',
+            'kokkino': 'Rdeča', 'κόκκινο': 'Rdeča',
+            'prasino': 'Zelena', 'πράσινο': 'Zelena',
+            'kafe': 'Rjava', 'καφέ': 'Rjava',
+            
+            // Italian
+            'nero': 'Črna', 'nera': 'Črna',
+            'blu': 'Modra', 'azzurro': 'Modra', 'azzurra': 'Modra',
+            'bianco': 'Bela', 'bianca': 'Bela',
+            'grigio': 'Siva', 'grigia': 'Siva',
+            'rosso': 'Rdeča', 'rossa': 'Rdeča',
+            'verde': 'Zelena',
+            'marrone': 'Rjava',
+            'beige': 'Bež',
+            'rosa': 'Roza',
+            'arancione': 'Oranžna',
+            'viola': 'Vijolična',
+            'giallo': 'Rumena', 'gialla': 'Rumena',
+            'turchese': 'Turkizna',
+            
+            // Slovak (similar to Czech)
+            'modrý': 'Modra', 'modry': 'Modra',
+            'zelený': 'Zelena', 'zeleny': 'Zelena',
+            'červený': 'Rdeča', 'cerveny': 'Rdeča',
+            'čierny': 'Črna', 'cierny': 'Črna',
+            'biely': 'Bela',
+            'sivý': 'Siva', 'sivy': 'Siva',
+            'hnedý': 'Rjava', 'hnedy': 'Rjava'
+        };
+        
+        // Product type translations
+        const productTypes = {
+            'NORIKS-BOXERS': 'Boksarice',
+            'NORIKS-SHIRTS': 'Majica',
+            'NORIKS-STARTER': 'Starter paket',
+            'NORIKS-SOCKS': 'Nogavice',
+            'Tricka': 'Majica',
+            'Boxerky': 'Boksarice',
+            'bokserice': 'Boksarice',
+            'majica': 'Majica',
+            'majice': 'Majica'
+        };
+        
+        // Color hex codes for visual indicator
+        const colorHex = {
+            'Črna': '#1a1a1a',
+            'Modra': '#3b82f6',
+            'Bela': '#ffffff',
+            'Siva': '#6b7280',
+            'Rdeča': '#ef4444',
+            'Zelena': '#22c55e',
+            'Rjava': '#92400e',
+            'Bež': '#d4c5a9',
+            'Roza': '#ec4899',
+            'Oranžna': '#f97316',
+            'Vijolična': '#8b5cf6',
+            'Rumena': '#eab308',
+            'Turkizna': '#06b6d4',
+            'Temno modra': '#1e3a8a',
+            'Svetlo modra': '#93c5fd'
+        };
+        
+        function translateColor(color) {
+            const normalized = color.toLowerCase().trim();
+            return colorTranslations[normalized] || color;
+        }
+        
+        function getProductType(code, name) {
+            // Check code first
+            for (const [key, value] of Object.entries(productTypes)) {
+                if (code.toUpperCase().includes(key.toUpperCase())) {
+                    return value;
+                }
+            }
+            // Check name
+            const nameLower = name.toLowerCase();
+            for (const [key, value] of Object.entries(productTypes)) {
+                if (nameLower.includes(key.toLowerCase())) {
+                    return value;
+                }
+            }
+            return '';
+        }
+        
+        function parseDocDesc(docDesc, productCode, productName) {
+            if (!docDesc) return [];
+            
+            const items = [];
+            const productType = getProductType(productCode, productName);
+            
+            // Pattern: "1 : Color - Size" or "1 : Type: Color - Size"
+            // Examples:
+            // "1 : Modrá - 4XL 2 : Zelená - 4XL"
+            // "1 : Tricka: Čierna - L 2 : Boxerky: Čierna - XL"
+            
+            const regex = /(\d+)\s*:\s*(?:([^:]+):\s*)?([^-\d]+)\s*-\s*(\S+)/g;
+            let match;
+            
+            while ((match = regex.exec(docDesc)) !== null) {
+                const itemType = match[2] ? productTypes[match[2].trim()] || match[2].trim() : productType;
+                const color = translateColor(match[3].trim());
+                const size = match[4].trim();
+                
+                items.push({
+                    type: itemType,
+                    color: color,
+                    size: size,
+                    colorHex: colorHex[color] || '#ccc'
+                });
+            }
+            
+            // If no matches, try simpler format "velicina : XL" or "rozmiar : XL"
+            if (items.length === 0) {
+                const sizeMatch = docDesc.match(/(?:velicina|rozmiar|size|méret|velikost)\s*:\s*(\S+)/i);
+                if (sizeMatch) {
+                    items.push({
+                        type: productType || productName,
+                        color: '',
+                        size: sizeMatch[1],
+                        colorHex: '#ccc'
+                    });
+                }
+            }
+            
+            return items;
+        }
+        
+        function toggleDateFilter() {
+            const checkbox = document.getElementById('filter-today');
+            const dateInput = document.getElementById('filter-date');
+            if (checkbox.checked) {
+                dateInput.value = new Date().toISOString().split('T')[0];
+                dateInput.disabled = true;
+            } else {
+                dateInput.disabled = false;
+            }
+            refreshOrders();
+        }
+        
+        async function refreshOrders() {
+            const container = document.getElementById('orders-container');
+            container.innerHTML = `
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Nalagam naročila...</p>
+                </div>
+            `;
+            
+            const status = document.getElementById('filter-status').value;
+            const date = document.getElementById('filter-date').value;
+            
+            try {
+                const response = await fetch(`/launches/api/packing/orders?status=${encodeURIComponent(status)}&date=${date || ''}`);
+                const data = await response.json();
+                
+                if (data.error) {
+                    container.innerHTML = `<div class="empty-state"><h3>Napaka</h3><p>${data.error}</p></div>`;
+                    return;
+                }
+                
+                // Store orders globally for filtering
+                window.allOrders = data.orders || [];
+                filterByCountry();
+                
+            } catch (e) {
+                console.error('Error:', e);
+                container.innerHTML = `<div class="empty-state"><h3>Napaka</h3><p>${e.message}</p></div>`;
+            }
+        }
+        
+        // Country flags
+        const countryFlags = {
+            'Croatia': '🇭🇷',
+            'Czech Republic': '🇨🇿',
+            'Poland': '🇵🇱',
+            'Slovakia': '🇸🇰',
+            'Hungary': '🇭🇺',
+            'Greece': '🇬🇷',
+            'Italy': '🇮🇹'
+        };
+        
+        function filterByCountry() {
+            const container = document.getElementById('orders-container');
+            const countryFilter = selectedCountry;
+            const status = document.getElementById('filter-status').value;
+            
+            let orders = window.allOrders || [];
+            
+            // Filter by country if selected
+            if (countryFilter) {
+                orders = orders.filter(o => o.country === countryFilter);
+            }
+            
+            document.getElementById('order-count').textContent = orders.length;
+            
+            let totalItems = 0;
+            orders.forEach(o => {
+                o.items.forEach(i => totalItems += i.length);
+            });
+            document.getElementById('item-count').textContent = totalItems;
+            
+            if (orders.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>✅ Ni naročil za pakiranje</h3>
+                        <p>Vsa naročila s statusom "${status}"${countryFilter ? ` za ${countryFilter}` : ''} so obdelana.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = orders.map(order => `
+                <div class="order-card" data-country="${order.country}">
+                    <div class="order-header">
+                        <div>
+                            <div class="customer-name">${order.customer}</div>
+                            <div class="order-price">
+                                ${parseFloat(order.total || 0).toFixed(2)} ${currencySymbols[order.currency] || order.currency}
+                                ${order.currency !== 'EUR' ? `<span class="order-price-eur">≈ ${(parseFloat(order.total || 0) * (toEurRates[order.currency] || 1)).toFixed(2)} €</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="order-meta">
+                            <div class="order-id">#${order.id}</div>
+                            <div>${order.date} ${order.time ? `<strong>${order.time}</strong>` : ''}</div>
+                            <div>${countryFlags[order.country] || ''} ${order.country || ''}</div>
+                        </div>
+                    </div>
+                    <ul class="items-list">
+                        ${order.items.map(items => items.map(item => `
+                            <li class="item">
+                                <input type="checkbox" class="item-checkbox">
+                                ${item.color ? `<div class="item-color" style="background: ${item.colorHex}; ${item.color === 'Bela' ? 'border-color: #ccc;' : ''}"></div>` : ''}
+                                <span class="item-name">${item.color ? item.color + ' ' : ''}${item.type}</span>
+                                <span class="item-size">${item.size}</span>
+                            </li>
+                        `).join('')).join('')}
+                    </ul>
+                </div>
+            `).join('');
+        }
+        
+        // Initialize
+        document.getElementById('filter-date').value = new Date().toISOString().split('T')[0];
+        document.getElementById('filter-date').disabled = true;
+        refreshOrders();
+        
+        // Auto-refresh every 60 seconds
+        setInterval(refreshOrders, 60000);
+    </script>
+</body>
+</html>

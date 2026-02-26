@@ -1,0 +1,29 @@
+{
+  "pending": [
+    {
+      "id": 1771854128373,
+      "assignee": "Grega",
+      "taskName": "Facebook struktura oglasov",
+      "country": "HR",
+      "deadline": "2026-02-27",
+      "message": "Želim da je v petek narejeno vse kar sva se pogovarjala na sestanku",
+      "taskId": "custom-1771843614692",
+      "createdAt": "2026-02-23T13:42:08.373Z",
+      "slackSent": false,
+      "slackError": "No Slack ID for user"
+    }
+  ],
+  "sent": [
+    {
+      "id": 1771844213531,
+      "assignee": "Dejan",
+      "taskName": "Checker - stran OK",
+      "country": "HR",
+      "deadline": "2026-02-27",
+      "message": "Rabim checker za spletno stran. Uredi z rokotom. Vsak dan dvakrat na dan pogleda če vse dela ok.",
+      "taskId": "default-4",
+      "createdAt": "2026-02-23T10:56:53.531Z",
+      "sentAt": "2026-02-23T10:59:38.035Z"
+    }
+  ]
+}

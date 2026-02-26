@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Upload - Noriks</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, sans-serif; background: #111; color: #fff; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .container { max-width: 500px; padding: 40px; text-align: center; }
+        h1 { margin-bottom: 10px; }
+        p { color: #888; margin-bottom: 30px; }
+        .upload-box { border: 3px dashed #333; border-radius: 16px; padding: 60px 40px; cursor: pointer; transition: all 0.3s; }
+        .upload-box:hover { border-color: #3b82f6; background: rgba(59,130,246,0.1); }
+        .upload-box.dragover { border-color: #22c55e; background: rgba(34,197,94,0.1); }
+        .upload-icon { font-size: 48px; margin-bottom: 16px; }
+        .upload-text { font-size: 18px; margin-bottom: 8px; }
+        .upload-hint { font-size: 14px; color: #666; }
+        input[type="file"] { display: none; }
+        .progress { margin-top: 30px; display: none; }
+        .progress-bar { height: 8px; background: #333; border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: #3b82f6; width: 0%; transition: width 0.3s; }
+        .progress-text { margin-top: 10px; font-size: 14px; color: #888; }
+        .success { color: #22c55e; margin-top: 20px; display: none; }
+        .error { color: #ef4444; margin-top: 20px; display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📤 Video Upload</h1>
+        <p>Naloži video za analizo in lokalizacijo</p>
+        
+        <div class="upload-box" id="uploadBox">
+            <div class="upload-icon">🎬</div>
+            <div class="upload-text">Klikni ali povleci video sem</div>
+            <div class="upload-hint">MP4, MOV, AVI (do 500MB)</div>
+        </div>
+        
+        <input type="file" id="fileInput" accept="video/*">
+        
+        <div class="progress" id="progress">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">Nalaganje... 0%</div>
+        </div>
+        
+        <div class="success" id="success">✅ Video uspešno naložen!</div>
+        <div class="error" id="error"></div>
+    </div>
+    
+    <script>
+        const uploadBox = document.getElementById('uploadBox');
+        const fileInput = document.getElementById('fileInput');
+        const progress = document.getElementById('progress');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const success = document.getElementById('success');
+        const error = document.getElementById('error');
+        
+        uploadBox.addEventListener('click', () => fileInput.click());
+        
+        uploadBox.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadBox.classList.add('dragover');
+        });
+        
+        uploadBox.addEventListener('dragleave', () => {
+            uploadBox.classList.remove('dragover');
+        });
+        
+        uploadBox.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadBox.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file) uploadFile(file);
+        });
+        
+        fileInput.addEventListener('change', () => {
+            const file = fileInput.files[0];
+            if (file) uploadFile(file);
+        });
+        
+        async function uploadFile(file) {
+            if (!file.type.startsWith('video/')) {
+                error.textContent = '❌ Prosim izberi video datoteko';
+                error.style.display = 'block';
+                return;
+            }
+            
+            if (file.size > 500 * 1024 * 1024) {
+                error.textContent = '❌ Datoteka je prevelika (max 500MB)';
+                error.style.display = 'block';
+                return;
+            }
+            
+            error.style.display = 'none';
+            success.style.display = 'none';
+            progress.style.display = 'block';
+            
+            const formData = new FormData();
+            formData.append('video', file);
+            
+            const xhr = new XMLHttpRequest();
+            
+            xhr.upload.addEventListener('progress', (e) => {
+                if (e.lengthComputable) {
+                    const percent = Math.round((e.loaded / e.total) * 100);
+                    progressFill.style.width = percent + '%';
+                    progressText.textContent = `Nalaganje... ${percent}%`;
+                }
+            });
+            
+            xhr.addEventListener('load', () => {
+                if (xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    success.innerHTML = `✅ Video uspešno naložen!<br><small>${response.filename}</small>`;
+                    success.style.display = 'block';
+                    progress.style.display = 'none';
+                } else {
+                    error.textContent = '❌ Napaka pri nalaganju';
+                    error.style.display = 'block';
+                    progress.style.display = 'none';
+                }
+            });
+            
+            xhr.addEventListener('error', () => {
+                error.textContent = '❌ Napaka pri povezavi';
+                error.style.display = 'block';
+                progress.style.display = 'none';
+            });
+            
+            xhr.open('POST', '/launches/api/upload-video');
+            xhr.send(formData);
+        }
+    </script>
+</body>
+</html>

@@ -1,111 +1,238 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Launches | Noriks</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Country Launch Tracker | Noriks</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --blue: #3b82f6; --blue-dark: #2563eb; --green: #22c55e; --green-bg: #dcfce7;
+            --orange: #f97316; --red: #ef4444; --purple: #8b5cf6; --pink: #ec4899; --teal: #14b8a6;
+            --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb; --gray-300: #d1d5db;
+            --gray-400: #9ca3af; --gray-500: #6b7280; --gray-700: #374151; --gray-900: #111827;
+        }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--gray-100); color: var(--gray-900); min-height: 100vh; padding: 20px; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 24px; }
+        .header h1 { font-size: 24px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        
+        .tabs-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; justify-content: center; }
+        .tab { padding: 10px 20px; background: white; border: 2px solid var(--gray-200); border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+        .tab:hover { border-color: var(--blue); }
+        .tab.active { background: var(--blue); border-color: var(--blue); color: white; }
+        .tab-add { background: transparent; border-style: dashed; color: var(--gray-500); }
+        .flag { font-size: 18px; }
+        
+        .progress-section { background: white; border-radius: 12px; padding: 16px 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .progress-label { font-weight: 600; }
+        .progress-percent { font-size: 20px; font-weight: 700; color: var(--blue); }
+        .progress-bar { height: 12px; background: var(--gray-200); border-radius: 6px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--blue), #60a5fa); border-radius: 6px; transition: width 0.3s; }
+        .progress-stats { text-align: center; font-size: 13px; color: var(--gray-500); margin-top: 8px; }
+        
+        .category-group { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 16px; overflow: hidden; }
+        .category-header { padding: 12px 16px; display: flex; align-items: center; gap: 10px; cursor: pointer; border-bottom: 1px solid var(--gray-100); }
+        .category-header:hover { background: var(--gray-50); }
+        .category-icon { font-size: 18px; }
+        .category-name { font-weight: 600; font-size: 14px; flex: 1; }
+        .category-name-input { font-weight: 600; font-size: 14px; border: 1px solid var(--blue); border-radius: 4px; padding: 2px 8px; width: 150px; }
+        .category-count { font-size: 12px; color: var(--gray-500); background: var(--gray-100); padding: 2px 8px; border-radius: 10px; }
+        .category-progress { font-size: 12px; font-weight: 600; }
+        .category-toggle { color: var(--gray-400); transition: transform 0.2s; }
+        .category-toggle.collapsed { transform: rotate(-90deg); }
+        .category-edit-btn { color: var(--gray-300); font-size: 12px; padding: 4px; cursor: pointer; }
+        .category-edit-btn:hover { color: var(--blue); }
+        .category-tasks { display: block; }
+        .category-tasks.collapsed { display: none; }
+        
+        .cat-marketing .category-header { border-left: 4px solid var(--pink); }
+        .cat-it .category-header { border-left: 4px solid var(--blue); }
+        .cat-support .category-header { border-left: 4px solid var(--teal); }
+        .cat-analytics .category-header { border-left: 4px solid var(--purple); }
+        .cat-sales .category-header { border-left: 4px solid var(--orange); }
+        .cat-other .category-header { border-left: 4px solid var(--gray-400); }
+        
+        .task-item { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--gray-100); }
+        .task-item:hover { background: var(--gray-50); }
+        .task-item:last-child { border-bottom: none; }
+        .task-item.done { background: var(--green-bg); }
+        .task-item.done .task-name { text-decoration: line-through; color: var(--gray-500); }
+        .task-item.sortable-ghost { opacity: 0.4; }
+        .task-item.sortable-chosen { background: var(--gray-100); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        
+        .drag-handle { color: var(--gray-300); cursor: grab; padding: 4px; }
+        .checkbox { width: 22px; height: 22px; border: 2px solid var(--gray-300); border-radius: 5px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .checkbox.checked { background: var(--green); border-color: var(--green); color: white; }
+        .checkbox i { font-size: 11px; }
+        
+        .task-name { min-width: 120px; font-size: 13px; font-weight: 500; cursor: pointer; padding: 2px 4px; border-radius: 4px; }
+        .task-name:hover { background: var(--gray-100); }
+        .task-name-input { min-width: 120px; font-size: 13px; font-weight: 500; border: 1px solid var(--blue); border-radius: 4px; padding: 2px 8px; }
+        
+        .task-link { font-size: 11px; padding: 3px 8px; border-radius: 4px; background: var(--blue); color: white; text-decoration: none; display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+        .task-link:hover { background: var(--blue-dark); }
+        .task-link i { font-size: 10px; }
+        
+        .assignee-badge { font-size: 11px; padding: 3px 8px; border-radius: 4px; background: var(--gray-200); color: var(--gray-700); }
+        .daily-status { font-size: 11px; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-weight: 600; }
+        .daily-status.done { background: #dcfce7; color: #166534; }
+        .daily-status.pending { background: #fef3c7; color: #92400e; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+        .deadline-badge { font-size: 11px; padding: 3px 8px; border-radius: 4px; background: var(--purple); color: white; }
+        .deadline-badge.overdue { background: var(--red); }
+        .deadline-badge.soon { background: var(--orange); }
+        
+        .short-note { flex: 1; padding: 5px 8px; border: 1px solid var(--gray-200); border-radius: 5px; font-size: 12px; background: var(--gray-50); min-width: 80px; }
+        .short-note:focus { outline: none; border-color: var(--blue); background: white; }
+        .short-note.has-value { background: #fef3c7; border-color: #fbbf24; }
+        
+        .icon-btn { width: 26px; height: 26px; border: none; background: none; color: var(--gray-300); font-size: 12px; cursor: pointer; border-radius: 5px; flex-shrink: 0; }
+        .icon-btn:hover { background: var(--gray-100); color: var(--gray-600); }
+        .icon-btn.has-content { color: var(--orange); }
+        .icon-btn.has-link { color: var(--blue); }
+        .icon-btn.delete:hover { background: #fee2e2; color: var(--red); }
+        
+        .add-task-section { padding: 16px 20px; background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .add-task-btn { width: 100%; padding: 12px; border: 2px dashed var(--gray-300); border-radius: 8px; background: none; color: var(--gray-500); font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .add-task-btn:hover { border-color: var(--blue); color: var(--blue); }
+        
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: white; border-radius: 16px; width: 100%; max-width: 500px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--gray-200); }
+        .modal-header h3 { font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .modal-header h3 i { color: var(--blue); }
+        .modal-close { width: 32px; height: 32px; border: none; background: none; font-size: 24px; color: var(--gray-500); cursor: pointer; }
+        .modal-body { padding: 20px; }
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; font-size: 13px; font-weight: 600; color: var(--gray-700); margin-bottom: 6px; }
+        .form-input { width: 100%; padding: 10px 12px; border: 1px solid var(--gray-200); border-radius: 8px; font-size: 14px; font-family: inherit; }
+        .form-input:focus { outline: none; border-color: var(--blue); }
+        textarea.form-input { height: 100px; resize: vertical; }
+        .modal-footer { display: flex; justify-content: flex-end; gap: 10px; padding: 16px 20px; border-top: 1px solid var(--gray-200); }
+        .btn { padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; }
+        .btn-primary { background: var(--blue); color: white; }
+        .btn-secondary { background: var(--gray-200); color: var(--gray-700); }
+        .btn-slack { background: #4A154B; color: white; }
+        .slack-toggle { display: flex; align-items: center; gap: 10px; padding: 12px; background: var(--gray-50); border-radius: 8px; margin-top: 16px; }
+        .slack-toggle input[type="checkbox"] { width: 18px; height: 18px; }
+        .task-name-display { font-size: 14px; font-weight: 600; margin-bottom: 16px; padding: 10px; background: var(--gray-50); border-radius: 6px; }
+        .form-hint { font-size: 11px; color: var(--gray-500); margin-top: 4px; }
+        
+        @media (max-width: 768px) {
+            body { padding: 12px; }
+            .task-item { flex-wrap: wrap; gap: 6px; padding: 10px 12px; }
+            .task-name { min-width: calc(100% - 70px); order: 2; }
+            .short-note { width: 100%; order: 10; min-width: auto; }
+        }
+    </style>
 </head>
 <body>
-    <div class="app-container">
-        <!-- SIDEBAR -->
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">
-                    <span class="logo-icon">🚀</span>
-                    <span class="logo-text">LAUNCHES</span>
-                </div>
+    <div class="container">
+        <div class="header"><h1>🚀 Country Launch Tracker</h1></div>
+        <div class="tabs-container" id="tabsContainer"></div>
+        <div class="progress-section">
+            <div class="progress-header">
+                <span class="progress-label">Progress</span>
+                <span class="progress-percent" id="progressPercent">0%</span>
             </div>
-            
-            <nav class="sidebar-nav">
-                <ul class="nav-list" id="countryNav">
-                    <!-- Countries will be rendered here -->
-                </ul>
-                <div class="add-country-btn" onclick="showAddCountryModal()">
-                    <i class="fas fa-plus"></i>
-                    <span>Dodaj državo</span>
-                </div>
-            </nav>
-            
-            <div class="sidebar-footer">
-                <div class="user-info">
-                    <div class="user-avatar">N</div>
-                    <div class="user-details">
-                        <span class="user-name">Noriks</span>
-                        <span class="user-role">Launch Tracker</span>
-                    </div>
-                </div>
-            </div>
-        </aside>
-        
-        <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
-        
-        <!-- MAIN CONTENT -->
-        <main class="main-content">
-            <header class="top-bar">
-                <div class="top-bar-left">
-                    <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <h1 class="page-title">Country Launch Tracker</h1>
-                </div>
-                <div class="top-bar-right">
-                    <div class="current-country" id="currentCountry">
-                        <span class="country-flag" id="countryFlag">🇭🇷</span>
-                        <span class="country-name" id="countryName">HR</span>
-                    </div>
-                </div>
-            </header>
-            
-            <div class="content-wrapper">
-                <!-- Progress Section -->
-                <div class="progress-section">
-                    <div class="progress-info">
-                        <span class="progress-label">Progress</span>
-                        <span class="progress-percent" id="progressPercent">0%</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
-                    </div>
-                    <div class="progress-stats">
-                        <span id="tasksDone">0</span> / <span id="tasksTotal">0</span> taskov opravljenih
-                    </div>
-                </div>
-                
-                <!-- Tasks Section -->
-                <div class="card tasks-card">
-                    <div class="card-header">
-                        <h2><i class="fas fa-tasks"></i> Taski</h2>
-                    </div>
-                    <div class="tasks-list" id="tasksList">
-                        <!-- Tasks will be rendered here -->
-                    </div>
-                    <div class="add-task-section">
-                        <button class="add-task-btn" onclick="showAddTaskModal()">
-                            <i class="fas fa-plus"></i> Dodaj nov task
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </main>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+            <div class="progress-stats"><span id="tasksDone">0</span> / <span id="tasksTotal">0</span> taskov opravljenih</div>
+        </div>
+        <div id="categoriesContainer"></div>
+        <div class="add-task-section">
+            <button class="add-task-btn" onclick="showAddTaskModal()"><i class="fas fa-plus"></i> Dodaj nov task</button>
+        </div>
     </div>
     
     <!-- Notes Modal -->
     <div class="modal-overlay" id="notesModal">
         <div class="modal">
             <div class="modal-header">
-                <h3><i class="fas fa-sticky-note"></i> Zapiski</h3>
-                <button class="modal-close" onclick="closeNotesModal()">&times;</button>
+                <h3><i class="fas fa-lightbulb"></i> Ideje & Izboljšave</h3>
+                <button class="modal-close" onclick="closeModal('notesModal')">&times;</button>
             </div>
             <div class="modal-body">
-                <div class="task-name-display" id="modalTaskName"></div>
-                <textarea id="notesTextarea" placeholder="Vpiši ideje, izboljšave, komentarje..."></textarea>
+                <div class="task-name-display" id="notesTaskName"></div>
+                <textarea class="form-input" id="notesTextarea" placeholder="Vpiši ideje, izboljšave..."></textarea>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeNotesModal()">Prekliči</button>
+                <button class="btn btn-secondary" onclick="closeModal('notesModal')">Prekliči</button>
                 <button class="btn btn-primary" onclick="saveNotes()">Shrani</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Link Modal -->
+    <div class="modal-overlay" id="linkModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-link"></i> Dodaj povezavo</h3>
+                <button class="modal-close" onclick="closeModal('linkModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="task-name-display" id="linkTaskName"></div>
+                <div class="form-group">
+                    <label class="form-label">URL / Povezava</label>
+                    <input type="url" class="form-input" id="linkUrl" placeholder="https://...">
+                    <div class="form-hint">Lahko je link do orodja, dokumenta, generatorja...</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Naziv gumba (opcijsko)</label>
+                    <input type="text" class="form-input" id="linkLabel" placeholder="Odpri orodje">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('linkModal')">Prekliči</button>
+                <button class="btn btn-primary" onclick="saveLink()">Shrani</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Assign Modal -->
+    <div class="modal-overlay" id="assignModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-plus"></i> Dodeli nalogo</h3>
+                <button class="modal-close" onclick="closeModal('assignModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="task-name-display" id="assignTaskName"></div>
+                <div class="form-group">
+                    <label class="form-label">Odgovorna oseba</label>
+                    <select class="form-input" id="assignPerson">
+                        <option value="">-- Izberi --</option>
+                        <option value="Ajda">Ajda</option>
+                        <option value="Dejan">Dejan</option>
+                        <option value="Grega">Grega</option>
+                        <option value="Petra">Petra</option>
+                        <option value="Teja">Teja</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Rok (deadline)</label>
+                    <input type="date" class="form-input" id="assignDeadline">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Sporočilo</label>
+                    <textarea class="form-input" id="assignMessage" placeholder="Kaj se pričakuje..."></textarea>
+                </div>
+                <div class="slack-toggle">
+                    <input type="checkbox" id="sendSlack" checked>
+                    <label for="sendSlack"><i class="fab fa-slack"></i> Pošlji v Slack</label>
+                </div>
+            </div>
+            <div class="modal-footer" style="justify-content: space-between;">
+                <button class="btn" style="background: #ef4444; color: white;" onclick="removeAssignment()"><i class="fas fa-user-minus"></i> Odvzemi</button>
+                <div>
+                    <button class="btn btn-secondary" onclick="closeModal('assignModal')">Prekliči</button>
+                    <button class="btn btn-slack" onclick="saveAssignment()"><i class="fas fa-paper-plane"></i> Dodeli</button>
+                </div>
             </div>
         </div>
     </div>
@@ -115,13 +242,25 @@
         <div class="modal">
             <div class="modal-header">
                 <h3><i class="fas fa-plus-circle"></i> Dodaj nov task</h3>
-                <button class="modal-close" onclick="closeAddTaskModal()">&times;</button>
+                <button class="modal-close" onclick="closeModal('addTaskModal')">&times;</button>
             </div>
             <div class="modal-body">
-                <input type="text" id="newTaskName" placeholder="Ime taska..." class="modal-input">
+                <div class="form-group">
+                    <label class="form-label">Ime taska</label>
+                    <input type="text" class="form-input" id="newTaskName" placeholder="Ime taska...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Kategorija</label>
+                    <select class="form-input" id="newTaskCategory"></select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Povezava (opcijsko)</label>
+                    <input type="url" class="form-input" id="newTaskLink" placeholder="https://...">
+                    <div class="form-hint">Link do orodja ali resursa za ta task</div>
+                </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeAddTaskModal()">Prekliči</button>
+                <button class="btn btn-secondary" onclick="closeModal('addTaskModal')">Prekliči</button>
                 <button class="btn btn-primary" onclick="addNewTask()">Dodaj</button>
             </div>
         </div>
@@ -131,19 +270,630 @@
     <div class="modal-overlay" id="addCountryModal">
         <div class="modal">
             <div class="modal-header">
-                <h3><i class="fas fa-globe"></i> Dodaj novo državo</h3>
-                <button class="modal-close" onclick="closeAddCountryModal()">&times;</button>
+                <h3><i class="fas fa-globe"></i> Dodaj državo</h3>
+                <button class="modal-close" onclick="closeModal('addCountryModal')">&times;</button>
             </div>
             <div class="modal-body">
-                <input type="text" id="newCountryCode" placeholder="Koda države (npr. RO, BG, RS...)" class="modal-input" maxlength="3">
+                <input type="text" class="form-input" id="newCountryCode" placeholder="Koda države (npr. RO, BG...)" maxlength="3">
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeAddCountryModal()">Prekliči</button>
+                <button class="btn btn-secondary" onclick="closeModal('addCountryModal')">Prekliči</button>
                 <button class="btn btn-primary" onclick="addNewCountry()">Dodaj</button>
             </div>
         </div>
     </div>
     
-    <script src="app.js"></script>
+    <!-- Add Category Modal -->
+    <div class="modal-overlay" id="addCategoryModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-folder-plus"></i> Nova kategorija</h3>
+                <button class="modal-close" onclick="closeModal('addCategoryModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Ime kategorije</label>
+                    <input type="text" class="form-input" id="newCategoryName" placeholder="Ime kategorije...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Ikona (emoji)</label>
+                    <input type="text" class="form-input" id="newCategoryIcon" placeholder="📁" maxlength="2">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('addCategoryModal')">Prekliči</button>
+                <button class="btn btn-primary" onclick="addNewCategory()">Dodaj</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Daily Log Modal -->
+    <div class="modal-overlay" id="dailyLogModal">
+        <div class="modal" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3 id="dailyLogTaskName">📅 Dnevni Log</h3>
+                <button class="modal-close" onclick="closeModal('dailyLogModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom: 16px; padding: 12px; background: var(--gray-100); border-radius: 8px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-weight: 600;">👤 Odgovorna oseba:</span>
+                        <select id="dailyLogOwner" class="form-input" style="width: auto; padding: 6px 10px;" onchange="updateDailyLogOwner()">
+                            <option value="">-- Ni dodeljen --</option>
+                            <option value="Ajda">Ajda</option>
+                            <option value="Dejan">Dejan</option>
+                            <option value="Grega">Grega</option>
+                            <option value="Petra">Petra</option>
+                            <option value="Teja">Teja</option>
+                        </select>
+                    </div>
+                    <div style="font-size: 12px; color: var(--gray-500);">Ta oseba je zadolžena za vsakodnevno izvajanje.</div>
+                </div>
+                
+                <div style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
+                    <span style="font-weight: 600;">📅 Današnji datum: <span id="dailyLogToday"></span></span>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <button class="btn btn-primary" id="markTodayBtn" onclick="markTodayDone()">✅ Označi danes</button>
+                    </div>
+                </div>
+                <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                    <thead>
+                        <tr style="background: var(--gray-100);">
+                            <th style="padding: 10px; text-align: left;">Datum</th>
+                            <th style="padding: 10px; text-align: center;">Status</th>
+                            <th style="padding: 10px; text-align: left;">Kdo</th>
+                            <th style="padding: 10px; text-align: left;">Ura</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dailyLogTable">
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('dailyLogModal')">Zapri</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let appData = null;
+        let currentCountry = 'HR';
+        let currentTaskId = null;
+        const assignees = ['Ajda', 'Dejan', 'Grega', 'Petra', 'Teja'];
+        
+        const API_BASE = window.location.pathname.includes('launches') ? '/launches' : '';
+        const flags = { 'HR':'🇭🇷','CZ':'🇨🇿','PL':'🇵🇱','GR':'🇬🇷','IT':'🇮🇹','HU':'🇭🇺','SK':'🇸🇰','RO':'🇷🇴','BG':'🇧🇬','RS':'🇷🇸','SI':'🇸🇮' };
+        
+        let categories = JSON.parse(localStorage.getItem('launchCategories')) || {
+            marketing: { name: 'Marketing', icon: '📣' },
+            it: { name: 'IT', icon: '💻' },
+            support: { name: 'Support', icon: '🎧' },
+            analytics: { name: 'Analytics', icon: '📊' },
+            sales: { name: 'Sales', icon: '💰' },
+            other: { name: 'Ostalo', icon: '📁' }
+        };
+        
+        let categoryOrder = JSON.parse(localStorage.getItem('launchCategoryOrder')) || ['marketing', 'it', 'support', 'analytics', 'sales', 'other'];
+        
+        function saveCategories() {
+            localStorage.setItem('launchCategories', JSON.stringify(categories));
+            localStorage.setItem('launchCategoryOrder', JSON.stringify(categoryOrder));
+        }
+        
+        function getFlag(code) { return flags[code] || '🏳️'; }
+        
+        document.addEventListener('DOMContentLoaded', loadData);
+        
+        async function loadData() {
+            const res = await fetch(`${API_BASE}/api/data`);
+            appData = await res.json();
+            renderTabs();
+            loadCountry(currentCountry);
+            updateCategorySelect();
+        }
+        
+        function updateCategorySelect() {
+            const select = document.getElementById('newTaskCategory');
+            select.innerHTML = categoryOrder.map(key => 
+                `<option value="${key}">${categories[key]?.icon || '📁'} ${categories[key]?.name || key}</option>`
+            ).join('') + `<option value="__new__">➕ Nova kategorija...</option>`;
+            
+            select.onchange = function() {
+                if (this.value === '__new__') {
+                    this.value = 'other';
+                    showModal('addCategoryModal');
+                }
+            };
+        }
+        
+        function renderTabs() {
+            document.getElementById('tabsContainer').innerHTML = appData.countries.map(code => `
+                <button class="tab ${code === currentCountry ? 'active' : ''}" onclick="loadCountry('${code}')">
+                    <span class="flag">${getFlag(code)}</span><span>${code}</span>
+                </button>
+            `).join('') + `<button class="tab tab-add" onclick="showModal('addCountryModal')"><i class="fas fa-plus"></i></button>`;
+        }
+        
+        async function loadCountry(code) {
+            currentCountry = code;
+            renderTabs();
+            const res = await fetch(`${API_BASE}/api/country/${code}`);
+            const data = await res.json();
+            renderCategories([...data.tasks, ...(data.customTasks || [])]);
+        }
+        
+        function renderCategories(allTasks) {
+            const grouped = {};
+            categoryOrder.forEach(cat => grouped[cat] = []);
+            
+            allTasks.forEach(task => {
+                const cat = task.category || 'other';
+                if (!grouped[cat]) grouped[cat] = [];
+                grouped[cat].push(task);
+            });
+            
+            const container = document.getElementById('categoriesContainer');
+            container.innerHTML = categoryOrder.map(catKey => {
+                const tasks = grouped[catKey] || [];
+                if (tasks.length === 0) return '';
+                
+                const cat = categories[catKey] || { name: catKey, icon: '📁' };
+                const done = tasks.filter(t => t.done).length;
+                const percent = Math.round((done / tasks.length) * 100);
+                
+                return `
+                <div class="category-group cat-${catKey}">
+                    <div class="category-header" onclick="toggleCategory('${catKey}')">
+                        <span class="category-icon">${cat.icon}</span>
+                        <span class="category-name" id="catname-${catKey}" ondblclick="event.stopPropagation(); editCategoryName('${catKey}')">${cat.name}</span>
+                        <i class="fas fa-pen category-edit-btn" onclick="event.stopPropagation(); editCategoryName('${catKey}')" title="Preimenuj"></i>
+                        <span class="category-count">${tasks.length}</span>
+                        <span class="category-progress" style="color: ${percent === 100 ? 'var(--green)' : 'var(--gray-500)'}">${percent}%</span>
+                        <i class="fas fa-chevron-down category-toggle" id="toggle-${catKey}"></i>
+                    </div>
+                    <div class="category-tasks" id="tasks-${catKey}">
+                        ${tasks.map(task => renderTask(task)).join('')}
+                    </div>
+                </div>`;
+            }).join('');
+            
+            updateProgress(allTasks);
+            initSortables();
+        }
+        
+        function renderTask(task) {
+            const deadlineHtml = task.deadline ? formatDeadline(task.deadline) : '';
+            const linkHtml = task.link ? `<a href="${escapeHtml(task.link)}" target="_blank" class="task-link" onclick="event.stopPropagation()"><i class="fas fa-external-link-alt"></i> ${escapeHtml(task.linkLabel || 'Odpri')}</a>` : '';
+            
+            // Check if task has daily tracking (Instagram review tasks)
+            const hasDailyTracking = task.name.toLowerCase().includes('instagram');
+            const todayKey = new Date().toISOString().split('T')[0];
+            const todayDone = task.dailyLog && task.dailyLog[todayKey]?.done;
+            const dailyLogBtn = hasDailyTracking ? `
+                <span class="daily-status ${todayDone ? 'done' : 'pending'}" onclick="openDailyLog('${task.id}', '${escapeHtml(task.name)}')" title="${todayDone ? 'Danes označeno ✓' : 'Danes še ni označeno!'}">
+                    ${todayDone ? '✅ Danes' : '⏳ Danes'}
+                </span>
+                <button class="icon-btn daily-log-btn" onclick="openDailyLog('${task.id}', '${escapeHtml(task.name)}')" title="Dnevni Log" style="color: #8b5cf6;"><i class="fas fa-calendar-check"></i></button>` : '';
+            
+            return `
+            <div class="task-item ${task.done ? 'done' : ''}" data-id="${task.id}" data-category="${task.category || 'other'}">
+                <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
+                <div class="checkbox ${task.done ? 'checked' : ''}" onclick="toggleTask('${task.id}')">
+                    ${task.done ? '<i class="fas fa-check"></i>' : ''}
+                </div>
+                <span class="task-name" id="taskname-${task.id}" ondblclick="editTaskName('${task.id}')">${escapeHtml(task.name)}</span>
+                ${linkHtml}
+                ${dailyLogBtn}
+                <button class="icon-btn ${task.link ? 'has-link' : ''}" onclick="openLinkModal('${task.id}')" title="Povezava"><i class="fas fa-link"></i></button>
+                <button class="icon-btn" onclick="openAssignModal('${task.id}')" title="Dodeli"><i class="fas fa-user-plus"></i></button>
+                ${task.assignee ? `<span class="assignee-badge">${task.assignee}</span>` : ''}
+                ${deadlineHtml}
+                <input type="text" class="short-note ${task.shortNote ? 'has-value' : ''}" placeholder="Kratko..." value="${escapeHtml(task.shortNote || '')}" onchange="updateShortNote('${task.id}', this.value)">
+                <button class="icon-btn ${task.notes ? 'has-content' : ''}" onclick="openNotesModal('${task.id}')" title="Ideje"><i class="fas fa-lightbulb"></i></button>
+                <button class="icon-btn delete" onclick="deleteTask('${task.id}')" title="Izbriši"><i class="fas fa-trash"></i></button>
+            </div>`;
+        }
+        
+        function editTaskName(taskId) {
+            const el = document.getElementById(`taskname-${taskId}`);
+            const currentName = el.textContent;
+            el.outerHTML = `<input type="text" class="task-name-input" id="taskname-${taskId}" value="${escapeHtml(currentName)}" onblur="saveTaskName('${taskId}')" onkeydown="if(event.key==='Enter')this.blur();if(event.key==='Escape'){this.value='${escapeHtml(currentName)}';this.blur();}">`;
+            document.getElementById(`taskname-${taskId}`).focus();
+            document.getElementById(`taskname-${taskId}`).select();
+        }
+        
+        async function saveTaskName(taskId) {
+            const input = document.getElementById(`taskname-${taskId}`);
+            const newName = input.value.trim();
+            if (newName) {
+                await fetch(`${API_BASE}/api/country/${currentCountry}/task/${taskId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: newName })
+                });
+            }
+            loadCountry(currentCountry);
+        }
+        
+        function editCategoryName(catKey) {
+            const el = document.getElementById(`catname-${catKey}`);
+            const currentName = categories[catKey]?.name || catKey;
+            el.outerHTML = `<input type="text" class="category-name-input" id="catname-${catKey}" value="${escapeHtml(currentName)}" onblur="saveCategoryName('${catKey}')" onkeydown="if(event.key==='Enter')this.blur();if(event.key==='Escape'){this.value='${escapeHtml(currentName)}';this.blur();}">`;
+            document.getElementById(`catname-${catKey}`).focus();
+            document.getElementById(`catname-${catKey}`).select();
+        }
+        
+        function saveCategoryName(catKey) {
+            const input = document.getElementById(`catname-${catKey}`);
+            const newName = input.value.trim();
+            if (newName && categories[catKey]) {
+                categories[catKey].name = newName;
+                saveCategories();
+            }
+            loadCountry(currentCountry);
+        }
+        
+        function formatDeadline(dateStr) {
+            const deadline = new Date(dateStr);
+            const today = new Date(); today.setHours(0,0,0,0);
+            const diff = Math.ceil((deadline - today) / (1000*60*60*24));
+            let cls = diff < 0 ? 'overdue' : diff <= 3 ? 'soon' : '';
+            return `<span class="deadline-badge ${cls}">${deadline.toLocaleDateString('sl-SI', {day:'numeric',month:'short'})}</span>`;
+        }
+        
+        function toggleCategory(catKey) {
+            document.getElementById(`tasks-${catKey}`)?.classList.toggle('collapsed');
+            document.getElementById(`toggle-${catKey}`)?.classList.toggle('collapsed');
+        }
+        
+        function initSortables() {
+            categoryOrder.forEach(catKey => {
+                const el = document.getElementById(`tasks-${catKey}`);
+                if (el) {
+                    new Sortable(el, { animation: 150, handle: '.drag-handle', group: 'tasks', onEnd: saveOrder });
+                }
+            });
+        }
+        
+        async function saveOrder() {
+            const taskIds = [];
+            categoryOrder.forEach(cat => {
+                const el = document.getElementById(`tasks-${cat}`);
+                if (el) {
+                    el.querySelectorAll('.task-item').forEach(item => {
+                        taskIds.push(item.dataset.id);
+                        const newCat = item.closest('.category-group')?.classList[1]?.replace('cat-', '');
+                        if (newCat && newCat !== item.dataset.category) {
+                            fetch(`${API_BASE}/api/country/${currentCountry}/task/${item.dataset.id}`, {
+                                method: 'PUT', headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ category: newCat })
+                            });
+                        }
+                    });
+                }
+            });
+            await fetch(`${API_BASE}/api/country/${currentCountry}/reorder`, {
+                method: 'PUT', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ taskIds })
+            });
+        }
+        
+        function escapeHtml(text) { const d = document.createElement('div'); d.textContent = text || ''; return d.innerHTML; }
+        
+        function updateProgress(tasks) {
+            const total = tasks.length, done = tasks.filter(t => t.done).length;
+            const percent = total > 0 ? Math.round((done/total)*100) : 0;
+            document.getElementById('progressPercent').textContent = `${percent}%`;
+            document.getElementById('progressFill').style.width = `${percent}%`;
+            document.getElementById('tasksDone').textContent = done;
+            document.getElementById('tasksTotal').textContent = total;
+        }
+        
+        async function toggleTask(taskId) {
+            const el = document.querySelector(`[data-id="${taskId}"]`);
+            await fetch(`${API_BASE}/api/country/${currentCountry}/task/${taskId}`, {
+                method: 'PUT', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ done: !el.classList.contains('done') })
+            });
+            loadCountry(currentCountry);
+        }
+        
+        async function updateShortNote(taskId, value) {
+            const input = document.querySelector(`[data-id="${taskId}"] .short-note`);
+            if (input) input.classList.toggle('has-value', value.trim() !== '');
+            await fetch(`${API_BASE}/api/country/${currentCountry}/task/${taskId}`, {
+                method: 'PUT', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ shortNote: value })
+            });
+        }
+        
+        function showModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+        
+        async function openNotesModal(taskId) {
+            currentTaskId = taskId;
+            const res = await fetch(`${API_BASE}/api/country/${currentCountry}`);
+            const data = await res.json();
+            const task = [...data.tasks, ...(data.customTasks || [])].find(t => t.id === taskId);
+            if (task) {
+                document.getElementById('notesTaskName').textContent = task.name;
+                document.getElementById('notesTextarea').value = task.notes || '';
+                showModal('notesModal');
+            }
+        }
+        
+        async function saveNotes() {
+            await fetch(`${API_BASE}/api/country/${currentCountry}/task/${currentTaskId}`, {
+                method: 'PUT', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ notes: document.getElementById('notesTextarea').value })
+            });
+            closeModal('notesModal');
+            loadCountry(currentCountry);
+        }
+        
+        async function openLinkModal(taskId) {
+            currentTaskId = taskId;
+            const res = await fetch(`${API_BASE}/api/country/${currentCountry}`);
+            const data = await res.json();
+            const task = [...data.tasks, ...(data.customTasks || [])].find(t => t.id === taskId);
+            if (task) {
+                document.getElementById('linkTaskName').textContent = task.name;
+                document.getElementById('linkUrl').value = task.link || '';
+                document.getElementById('linkLabel').value = task.linkLabel || '';
+                showModal('linkModal');
+            }
+        }
+        
+        async function saveLink() {
+            const link = document.getElementById('linkUrl').value.trim();
+            const linkLabel = document.getElementById('linkLabel').value.trim();
+            await fetch(`${API_BASE}/api/country/${currentCountry}/task/${currentTaskId}`, {
+                method: 'PUT', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ link, linkLabel })
+            });
+            closeModal('linkModal');
+            loadCountry(currentCountry);
+        }
+        
+        async function openAssignModal(taskId) {
+            currentTaskId = taskId;
+            const res = await fetch(`${API_BASE}/api/country/${currentCountry}`);
+            const data = await res.json();
+            const task = [...data.tasks, ...(data.customTasks || [])].find(t => t.id === taskId);
+            if (task) {
+                document.getElementById('assignTaskName').textContent = task.name;
+                document.getElementById('assignPerson').value = task.assignee || '';
+                document.getElementById('assignDeadline').value = task.deadline || '';
+                document.getElementById('assignMessage').value = task.assignMessage || '';
+                showModal('assignModal');
+            }
+        }
+        
+        async function saveAssignment() {
+            const assignee = document.getElementById('assignPerson').value;
+            const deadline = document.getElementById('assignDeadline').value;
+            const assignMessage = document.getElementById('assignMessage').value;
+            
+            await fetch(`${API_BASE}/api/country/${currentCountry}/task/${currentTaskId}`, {
+                method: 'PUT', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ assignee, deadline, assignMessage })
+            });
+            
+            if (document.getElementById('sendSlack').checked && assignee) {
+                await fetch(`${API_BASE}/api/notify`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        assignee, taskName: document.getElementById('assignTaskName').textContent,
+                        country: currentCountry, deadline, message: assignMessage, taskId: currentTaskId
+                    })
+                });
+            }
+            closeModal('assignModal');
+            loadCountry(currentCountry);
+        }
+        
+        async function removeAssignment() {
+            if (!confirm('Odvzeti dodelitev te naloge?')) return;
+            
+            await fetch(`${API_BASE}/api/country/${currentCountry}/task/${currentTaskId}`, {
+                method: 'PUT', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ assignee: '', deadline: '', assignMessage: '' })
+            });
+            
+            closeModal('assignModal');
+            loadCountry(currentCountry);
+        }
+        
+        async function deleteTask(taskId) {
+            if (!confirm('Izbrisati?')) return;
+            await fetch(`${API_BASE}/api/country/${currentCountry}/task/${taskId}`, { method: 'DELETE' });
+            loadCountry(currentCountry);
+        }
+        
+        function showAddTaskModal() {
+            document.getElementById('newTaskName').value = '';
+            document.getElementById('newTaskLink').value = '';
+            document.getElementById('newTaskCategory').value = 'marketing';
+            updateCategorySelect();
+            showModal('addTaskModal');
+            document.getElementById('newTaskName').focus();
+        }
+        
+        async function addNewTask() {
+            const name = document.getElementById('newTaskName').value.trim();
+            const category = document.getElementById('newTaskCategory').value;
+            const link = document.getElementById('newTaskLink').value.trim();
+            if (!name) return;
+            await fetch(`${API_BASE}/api/country/${currentCountry}/task`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, category, link })
+            });
+            closeModal('addTaskModal');
+            loadCountry(currentCountry);
+        }
+        
+        function addNewCategory() {
+            const name = document.getElementById('newCategoryName').value.trim();
+            const icon = document.getElementById('newCategoryIcon').value.trim() || '📁';
+            if (!name) return;
+            const key = name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+            categories[key] = { name, icon };
+            if (!categoryOrder.includes(key)) categoryOrder.push(key);
+            saveCategories();
+            closeModal('addCategoryModal');
+            updateCategorySelect();
+            document.getElementById('newTaskCategory').value = key;
+        }
+        
+        async function addNewCountry() {
+            const code = document.getElementById('newCountryCode').value.trim().toUpperCase();
+            if (!code || code.length < 2) { alert('Vnesi kodo'); return; }
+            const res = await fetch(`${API_BASE}/api/country`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code })
+            });
+            if (!res.ok) { alert('Napaka'); return; }
+            closeModal('addCountryModal');
+            await loadData();
+            loadCountry(code);
+        }
+        
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') ['notesModal','assignModal','addTaskModal','addCountryModal','addCategoryModal','linkModal','dailyLogModal'].forEach(closeModal);
+        });
+        
+        // Daily Log functions
+        let dailyLogTaskId = null;
+        
+        async function openDailyLog(taskId, taskName) {
+            dailyLogTaskId = taskId;
+            document.getElementById('dailyLogTaskName').textContent = '📅 ' + taskName;
+            
+            const today = new Date();
+            document.getElementById('dailyLogToday').textContent = formatDate(today);
+            
+            // Load task data to get assignee (owner)
+            try {
+                const taskRes = await fetch(`${API_BASE}/api/country/${currentCountry}`);
+                const countryData = await taskRes.json();
+                const allTasks = [...(countryData.tasks || []), ...(countryData.customTasks || [])];
+                const task = allTasks.find(t => t.id === taskId);
+                document.getElementById('dailyLogOwner').value = task?.assignee || '';
+            } catch (e) {
+                document.getElementById('dailyLogOwner').value = '';
+            }
+            
+            // Load daily log data
+            try {
+                const res = await fetch(`${API_BASE}/api/country/${currentCountry}/task/${taskId}/daily-log`);
+                const log = await res.json();
+                renderDailyLogTable(log);
+            } catch (e) {
+                renderDailyLogTable({});
+            }
+            
+            showModal('dailyLogModal');
+        }
+        
+        async function updateDailyLogOwner() {
+            const owner = document.getElementById('dailyLogOwner').value;
+            await fetch(`${API_BASE}/api/country/${currentCountry}/task/${dailyLogTaskId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ assignee: owner })
+            });
+        }
+        
+        function formatDate(d) {
+            return d.toLocaleDateString('sl-SI', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        }
+        
+        function formatDateKey(d) {
+            return d.toISOString().split('T')[0];
+        }
+        
+        function renderDailyLogTable(log) {
+            const tbody = document.getElementById('dailyLogTable');
+            const today = new Date();
+            const todayKey = formatDateKey(today);
+            
+            let html = '';
+            for (let i = 0; i < 14; i++) {
+                const d = new Date(today);
+                d.setDate(d.getDate() - i);
+                const key = formatDateKey(d);
+                const entry = log[key];
+                const isDone = entry && entry.done;
+                const isToday = key === todayKey;
+                
+                html += `<tr style="${isToday ? 'background: #fef3c7;' : ''}">
+                    <td style="padding: 10px; ${isToday ? 'font-weight: 600;' : ''}">${formatDate(d)}${isToday ? ' (danes)' : ''}</td>
+                    <td style="padding: 10px; text-align: center;">
+                        <button onclick="toggleDayStatus('${key}', ${!isDone})" style="background: ${isDone ? '#dcfce7' : '#fee2e2'}; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 14px;">
+                            ${isDone ? '✅ Da' : '❌ Ne'}
+                        </button>
+                    </td>
+                    <td style="padding: 10px;">${entry?.by || '-'}</td>
+                    <td style="padding: 10px;">${entry?.time || '-'}</td>
+                </tr>`;
+            }
+            tbody.innerHTML = html;
+            
+            // Update button state
+            const todayEntry = log[todayKey];
+            const btn = document.getElementById('markTodayBtn');
+            if (todayEntry?.done) {
+                btn.textContent = '✅ Že označeno';
+                btn.disabled = true;
+                btn.style.opacity = '0.5';
+            } else {
+                btn.textContent = '✅ Označi danes';
+                btn.disabled = false;
+                btn.style.opacity = '1';
+            }
+        }
+        
+        async function toggleDayStatus(dateKey, setDone) {
+            const owner = document.getElementById('dailyLogOwner').value;
+            if (!owner) {
+                alert('Najprej izberi odgovorno osebo!');
+                return;
+            }
+            
+            try {
+                await fetch(`${API_BASE}/api/country/${currentCountry}/task/${dailyLogTaskId}/daily-log/${dateKey}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ done: setDone, by: owner })
+                });
+                
+                // Reload
+                openDailyLog(dailyLogTaskId, document.getElementById('dailyLogTaskName').textContent.replace('📅 ', ''));
+            } catch (e) {
+                alert('Napaka pri shranjevanju');
+            }
+        }
+        
+        async function markTodayDone() {
+            const owner = document.getElementById('dailyLogOwner').value;
+            if (!owner) {
+                alert('Najprej dodeli odgovorno osebo!');
+                return;
+            }
+            
+            try {
+                await fetch(`${API_BASE}/api/country/${currentCountry}/task/${dailyLogTaskId}/daily-log`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ by: owner })
+                });
+                
+                // Reload
+                openDailyLog(dailyLogTaskId, document.getElementById('dailyLogTaskName').textContent.replace('📅 ', ''));
+            } catch (e) {
+                alert('Napaka pri shranjevanju');
+            }
+        }
+    </script>
 </body>
 </html>
