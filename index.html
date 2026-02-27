@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pakiranje | NORIKS</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: #1a1a1a;
+            color: #fff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header h1 { font-size: 20px; font-weight: 600; }
+        .header h1 span { color: #10b981; }
+        
+        .header-actions { display: flex; gap: 10px; align-items: center; }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary { background: #10b981; color: #fff; }
+        .btn-primary:hover { background: #059669; }
+        .btn-secondary { background: #333; color: #fff; }
+        .btn-secondary:hover { background: #444; }
+        .btn-danger { background: #ef4444; color: #fff; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-warning { background: #f59e0b; color: #fff; }
+        .btn-warning:hover { background: #d97706; }
+        
+        .stats { display: flex; gap: 20px; color: #888; font-size: 14px; }
+        .stats span { color: #10b981; font-weight: 600; }
+        
+        .container { max-width: 1000px; margin: 0 auto; padding: 20px; padding-bottom: 80px; }
+        
+        .filters {
+            background: #fff;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .filters label { font-size: 13px; color: #666; }
+        
+        .country-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
+        
+        .country-btn {
+            padding: 6px 14px;
+            border: 2px solid #ddd;
+            border-radius: 20px;
+            background: #fff;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .country-btn:hover { border-color: #10b981; }
+        .country-btn.active { background: #10b981; color: #fff; border-color: #10b981; }
+        
+        .order-price { font-size: 12px; font-weight: 700; color: #10b981; }
+        .order-price-eur { font-size: 10px; color: #888; font-weight: 400; }
+        
+        .order-card.new-order { border-left: 4px solid #f59e0b; background: #fffbeb; }
+        
+        .new-badge {
+            display: inline-block; background: #f59e0b; color: #fff;
+            font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 3px; margin-left: 6px;
+        }
+        
+        .filters select, .filters input[type="date"] {
+            padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;
+        }
+        
+        .order-card {
+            background: #fff;
+            border-radius: 8px;
+            padding: 10px 14px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            page-break-inside: avoid;
+            position: relative;
+            transition: all 0.2s;
+        }
+        
+        .order-card.selected {
+            outline: 3px solid #3b82f6;
+            background: #eff6ff;
+        }
+        
+        .order-card.packed {
+            opacity: 0.5;
+            background: #f0fdf4;
+            border-left: 4px solid #10b981;
+        }
+        
+        .order-select {
+            position: absolute;
+            top: 10px;
+            left: -2px;
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            z-index: 10;
+            accent-color: #3b82f6;
+        }
+        
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 6px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #f0f0f0;
+            margin-left: 24px;
+        }
+        
+        .customer-name { font-size: 15px; font-weight: 700; color: #1a1a1a; }
+        .order-meta { text-align: right; font-size: 11px; color: #888; }
+        .order-id { font-weight: 600; color: #10b981; }
+        
+        .items-list { list-style: none; margin-left: 24px; }
+        
+        .item {
+            display: flex; align-items: center;
+            padding: 3px 0; border-bottom: 1px solid #f8f8f8; font-size: 13px;
+        }
+        .item:last-child { border-bottom: none; }
+        
+        .product-label {
+            font-size: 11px; color: #888; font-weight: 600;
+            padding: 5px 0 2px; border-top: 1px dashed #e0e0e0;
+            margin-top: 2px; list-style: none;
+        }
+        .product-label:first-child { border-top: none; margin-top: 0; }
+        
+        .item-checkbox { width: 18px; height: 18px; margin-right: 8px; cursor: pointer; }
+        .item-color { width: 14px; height: 14px; border-radius: 50%; margin-right: 8px; border: 2px solid #ddd; }
+        .item-name { flex: 1; font-weight: 500; }
+        .item-size { background: #f0f0f0; padding: 2px 8px; border-radius: 4px; font-weight: 700; font-size: 12px; }
+        
+        .packed-badge {
+            display: inline-block; background: #10b981; color: #fff;
+            font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 3px; margin-left: 6px;
+        }
+        
+        .loading { text-align: center; padding: 60px 20px; color: #888; }
+        .loading-spinner {
+            width: 40px; height: 40px; border: 3px solid #f0f0f0;
+            border-top-color: #10b981; border-radius: 50%;
+            animation: spin 1s linear infinite; margin: 0 auto 15px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .empty-state { text-align: center; padding: 60px 20px; color: #888; }
+        .empty-state h3 { color: #333; margin-bottom: 10px; }
+        
+        /* Floating action bar */
+        .action-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #1e3a5f;
+            color: #fff;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            z-index: 200;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.3);
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .action-bar.visible { transform: translateY(0); }
+        
+        body.has-action-bar { padding-bottom: 70px; }
+        
+        .action-bar .count { font-size: 16px; font-weight: 700; }
+        
+        /* Print styles */
+        @media print {
+            .header, .filters, .btn, .item-checkbox, .no-print, .action-bar, .order-select { display: none !important; }
+            body { background: #fff; font-size: 10px; }
+            .container { max-width: 100%; padding: 0; }
+            #orders-container { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 6px !important; }
+            .order-card {
+                box-shadow: none; border: 1px solid #ddd;
+                margin-bottom: 0; padding: 6px 10px; break-inside: avoid;
+            }
+            .order-card.packed { display: none !important; }
+            .order-header { margin-left: 0; }
+            .items-list { margin-left: 0; }
+            .item { font-size: 11px; padding: 2px 0; }
+            .customer-name { font-size: 12px; }
+            .order-meta { font-size: 9px; }
+            .order-price { font-size: 10px; }
+            .item-size { font-size: 10px; padding: 1px 6px; }
+            .item-color { width: 10px; height: 10px; margin-right: 5px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📦 <span>Pakiranje</span> | NORIKS</h1>
+        <div class="header-actions">
+            <div class="stats">
+                <div>Naročil: <span id="order-count">-</span></div>
+                <div>Artiklov: <span id="item-count">-</span></div>
+                <div id="packed-stats" style="display:none;">Spakiranih: <span id="packed-count">0</span></div>
+            </div>
+            <button class="btn btn-secondary" onclick="refreshOrders()">🔄 Osveži</button>
+            <button class="btn btn-secondary" id="toggle-packed-btn" onclick="toggleShowPacked()" style="display:none;">👁 Pokaži spakirane</button>
+            <button class="btn btn-primary" onclick="printSelected()">🖨️ Natisni</button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="filters no-print">
+            <label>
+                Datum:
+                <input type="date" id="filter-date" onchange="refreshOrders()">
+            </label>
+            <label>
+                Status:
+                <select id="filter-status" onchange="refreshOrders()">
+                    <option value="Odpremljen" selected>Odpremljen</option>
+                    <option value="Pripravljen za odpremo">Pripravljen za odpremo</option>
+                    <option value="Novo">Novo</option>
+                </select>
+            </label>
+            <div class="country-buttons" id="country-buttons">
+                <button class="country-btn active" data-country="" onclick="selectCountry(this)">Vse</button>
+                <button class="country-btn" data-country="Croatia" onclick="selectCountry(this)">🇭🇷</button>
+                <button class="country-btn" data-country="Czech Republic" onclick="selectCountry(this)">🇨🇿</button>
+                <button class="country-btn" data-country="Poland" onclick="selectCountry(this)">🇵🇱</button>
+                <button class="country-btn" data-country="Slovakia" onclick="selectCountry(this)">🇸🇰</button>
+                <button class="country-btn" data-country="Hungary" onclick="selectCountry(this)">🇭🇺</button>
+                <button class="country-btn" data-country="Greece" onclick="selectCountry(this)">🇬🇷</button>
+                <button class="country-btn" data-country="Italy" onclick="selectCountry(this)">🇮🇹</button>
+            </div>
+            <button class="country-btn active" id="sort-btn" onclick="toggleSort()" style="margin-left:10px;">🕐 Najnovejši ↑</button>
+            <label>
+                <input type="checkbox" id="filter-today" checked onchange="toggleDateFilter()">
+                Samo danes
+            </label>
+        </div>
+        
+        <div id="orders-container" style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <p>Nalagam naročila...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating action bar for selected orders -->
+    <div class="action-bar" id="action-bar">
+        <span class="count">Izbranih: <span id="selected-count">0</span></span>
+        <button class="btn btn-primary" onclick="printSelected()" style="font-size:16px;">🖨️ Natisni izbrane</button>
+        <button class="btn btn-warning" onclick="markAsPacked()" style="font-size:16px;">📦 Označi kot spakirano</button>
+        <button class="btn btn-secondary" onclick="clearSelection()">✕ Prekliči</button>
+    </div>
+
+    <script>
+        // ========== PACKED ORDERS (localStorage) ==========
+        // Format: { orderId: { packedAt: ISO string, customer: string } }
+        let packedOrders = JSON.parse(localStorage.getItem('packing-packed') || '{}');
+        let showPacked = false;
+        let selectedOrderIds = new Set();
+        
+        function savePackedOrders() {
+            localStorage.setItem('packing-packed', JSON.stringify(packedOrders));
+        }
+        
+        function isOrderPacked(orderId) {
+            return !!packedOrders[orderId];
+        }
+        
+        function markAsPacked() {
+            if (selectedOrderIds.size === 0) return;
+            const orders = window.allOrders || [];
+            selectedOrderIds.forEach(id => {
+                const order = orders.find(o => o.id === id);
+                packedOrders[id] = {
+                    packedAt: new Date().toISOString(),
+                    customer: order ? order.customer : ''
+                };
+            });
+            savePackedOrders();
+            selectedOrderIds.clear();
+            updateActionBar();
+            filterByCountry();
+        }
+        
+        function unpackOrder(orderId) {
+            delete packedOrders[orderId];
+            savePackedOrders();
+            filterByCountry();
+        }
+        
+        function toggleShowPacked() {
+            showPacked = !showPacked;
+            const btn = document.getElementById('toggle-packed-btn');
+            btn.textContent = showPacked ? '👁 Skrij spakirane' : '👁 Pokaži spakirane';
+            btn.classList.toggle('active', showPacked);
+            filterByCountry();
+        }
+        
+        function toggleOrderSelect(orderId) {
+            if (selectedOrderIds.has(orderId)) {
+                selectedOrderIds.delete(orderId);
+            } else {
+                selectedOrderIds.add(orderId);
+            }
+            // Update checkbox + card UI immediately
+            document.querySelectorAll('.order-card').forEach(card => {
+                const id = card.dataset.orderId;
+                const isSelected = selectedOrderIds.has(id);
+                card.classList.toggle('selected', isSelected);
+                const cb = card.querySelector('.order-select');
+                if (cb) cb.checked = isSelected;
+            });
+            updateActionBar();
+        }
+        
+        function selectAllVisible() {
+            document.querySelectorAll('.order-card:not(.packed) .order-select').forEach(cb => {
+                const id = cb.dataset.orderId;
+                selectedOrderIds.add(id);
+                cb.checked = true;
+            });
+            updateActionBar();
+        }
+        
+        function clearSelection() {
+            selectedOrderIds.clear();
+            document.querySelectorAll('.order-select').forEach(cb => cb.checked = false);
+            updateActionBar();
+        }
+        
+        function updateActionBar() {
+            const bar = document.getElementById('action-bar');
+            const count = selectedOrderIds.size;
+            document.getElementById('selected-count').textContent = count;
+            bar.classList.toggle('visible', count > 0);
+            document.body.classList.toggle('has-action-bar', count > 0);
+        }
+        
+        function printSelected() {
+            if (selectedOrderIds.size > 0) {
+                // Hide non-selected cards for printing
+                document.querySelectorAll('.order-card').forEach(card => {
+                    const id = card.dataset.orderId;
+                    if (!selectedOrderIds.has(id)) {
+                        card.style.display = 'none';
+                        card.dataset.hiddenForPrint = 'true';
+                    }
+                });
+                window.print();
+                // Restore
+                document.querySelectorAll('[data-hidden-for-print]').forEach(card => {
+                    card.style.display = '';
+                    delete card.dataset.hiddenForPrint;
+                });
+            } else {
+                window.print();
+            }
+        }
+        
+        // ========== EXCHANGE RATES & CONSTANTS ==========
+        const toEurRates = { 'EUR': 1, 'CZK': 0.04, 'PLN': 0.23, 'HUF': 0.0025 };
+        const currencySymbols = { 'EUR': '€', 'CZK': 'Kč', 'PLN': 'zł', 'HUF': 'Ft' };
+        const countryFlags = {
+            'Croatia': '🇭🇷', 'Czech Republic': '🇨🇿', 'Poland': '🇵🇱',
+            'Slovakia': '🇸🇰', 'Hungary': '🇭🇺', 'Greece': '🇬🇷', 'Italy': '🇮🇹'
+        };
+        
+        let selectedCountry = '';
+        let sortNewestFirst = true;
+        
+        function toggleSort() {
+            sortNewestFirst = !sortNewestFirst;
+            document.getElementById('sort-btn').textContent = sortNewestFirst ? '🕐 Najnovejši ↑' : '🕐 Najstarejši ↑';
+            filterByCountry();
+        }
+        
+        let knownOrderIds = JSON.parse(localStorage.getItem('packing-known-ids') || '[]');
+        let newOrderIds = new Set();
+        
+        function markOrdersSeen(orders) {
+            const currentIds = orders.map(o => o.id);
+            if (knownOrderIds.length === 0) {
+                knownOrderIds = currentIds;
+            } else {
+                newOrderIds = new Set(currentIds.filter(id => !knownOrderIds.includes(id)));
+                knownOrderIds = [...new Set([...knownOrderIds, ...currentIds])];
+            }
+            localStorage.setItem('packing-known-ids', JSON.stringify(knownOrderIds));
+        }
+        
+        function selectCountry(btn) {
+            document.querySelectorAll('.country-btn[data-country]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedCountry = btn.dataset.country;
+            filterByCountry();
+        }
+        
+        // ========== COLOR & PRODUCT TRANSLATIONS ==========
+        const colorTranslations = {
+            'modrá': 'Modra', 'modra': 'Modra', 'zelená': 'Zelena', 'zelena': 'Zelena',
+            'červená': 'Rdeča', 'cervena': 'Rdeča', 'čierna': 'Črna', 'cierna': 'Črna',
+            'černá': 'Črna', 'cerna': 'Črna', 'biela': 'Bela', 'bílá': 'Bela', 'bila': 'Bela',
+            'šedá': 'Siva', 'seda': 'Siva', 'sivá': 'Siva', 'hnedá': 'Rjava', 'hneda': 'Rjava',
+            'béžová': 'Bež', 'bezova': 'Bež', 'fialová': 'Vijolična', 'fialova': 'Vijolična',
+            'oranžová': 'Oranžna', 'oranzova': 'Oranžna', 'růžová': 'Roza', 'ruzova': 'Roza',
+            'žlutá': 'Rumena', 'zluta': 'Rumena', 'tyrkysová': 'Turkizna', 'tyrkysova': 'Turkizna',
+            'tmavomodrá': 'Temno modra', 'tmavomodra': 'Temno modra',
+            'svetlomodrá': 'Svetlo modra', 'svetlomodra': 'Svetlo modra',
+            'czarny': 'Črna', 'czarna': 'Črna', 'niebieski': 'Modra', 'niebieska': 'Modra',
+            'szary': 'Siva', 'szara': 'Siva', 'zielony': 'Zelena', 'zielona': 'Zelena',
+            'czerwony': 'Rdeča', 'czerwona': 'Rdeča', 'biały': 'Bela', 'bialy': 'Bela',
+            'biała': 'Bela', 'biala': 'Bela', 'brązowy': 'Rjava', 'brazowy': 'Rjava',
+            'beżowy': 'Bež', 'bezowy': 'Bež', 'różowy': 'Roza', 'rozowy': 'Roza',
+            'pomarańczowy': 'Oranžna', 'pomaranczowy': 'Oranžna', 'fioletowy': 'Vijolična',
+            'żółty': 'Rumena', 'zolty': 'Rumena', 'granatowy': 'Temno modra', 'turkusowy': 'Turkizna',
+            'crna': 'Črna', 'crno': 'Črna', 'plava': 'Modra', 'plavo': 'Modra',
+            'bijela': 'Bela', 'bijelo': 'Bela', 'siva': 'Siva', 'sivo': 'Siva',
+            'crvena': 'Rdeča', 'crveno': 'Rdeča', 'smeđa': 'Rjava', 'smeda': 'Rjava', 'smeđo': 'Rjava',
+            'bez': 'Bež', 'roza': 'Roza', 'narančasta': 'Oranžna', 'narancasta': 'Oranžna',
+            'ljubičasta': 'Vijolična', 'ljubicasta': 'Vijolična', 'žuta': 'Rumena', 'zuta': 'Rumena',
+            'tirkizna': 'Turkizna', 'tamno plava': 'Temno modra',
+            'fekete': 'Črna', 'kék': 'Modra', 'kek': 'Modra', 'fehér': 'Bela', 'feher': 'Bela',
+            'szürke': 'Siva', 'szurke': 'Siva', 'piros': 'Rdeča', 'zöld': 'Zelena', 'zold': 'Zelena',
+            'barna': 'Rjava', 'bézs': 'Bež', 'bezs': 'Bež', 'rózsaszín': 'Roza', 'rozsaszin': 'Roza',
+            'narancssárga': 'Oranžna', 'narancssarga': 'Oranžna', 'lila': 'Vijolična',
+            'sárga': 'Rumena', 'sarga': 'Rumena', 'türkiz': 'Turkizna', 'turkiz': 'Turkizna',
+            'sötétkék': 'Temno modra', 'sotetkek': 'Temno modra',
+            'mavro': 'Črna', 'μαύρο': 'Črna', 'ble': 'Modra', 'μπλε': 'Modra',
+            'aspro': 'Bela', 'άσπρο': 'Bela', 'lefko': 'Bela', 'gkri': 'Siva', 'γκρι': 'Siva',
+            'kokkino': 'Rdeča', 'κόκκινο': 'Rdeča', 'prasino': 'Zelena', 'πράσινο': 'Zelena',
+            'kafe': 'Rjava', 'καφέ': 'Rjava',
+            'nero': 'Črna', 'nera': 'Črna', 'blu': 'Modra', 'azzurro': 'Modra', 'azzurra': 'Modra',
+            'bianco': 'Bela', 'bianca': 'Bela', 'grigio': 'Siva', 'grigia': 'Siva',
+            'rosso': 'Rdeča', 'rossa': 'Rdeča', 'verde': 'Zelena', 'marrone': 'Rjava',
+            'beige': 'Bež', 'rosa': 'Roza', 'arancione': 'Oranžna', 'viola': 'Vijolična',
+            'giallo': 'Rumena', 'gialla': 'Rumena', 'turchese': 'Turkizna',
+            'modrý': 'Modra', 'modry': 'Modra', 'zelený': 'Zelena', 'zeleny': 'Zelena',
+            'červený': 'Rdeča', 'cerveny': 'Rdeča', 'čierny': 'Črna', 'cierny': 'Črna',
+            'biely': 'Bela', 'sivý': 'Siva', 'sivy': 'Siva', 'hnedý': 'Rjava', 'hnedy': 'Rjava'
+        };
+        
+        const productTypes = {
+            'NORIKS-BOXERS': 'Boksarice', 'NORIKS-SHIRTS': 'Majica',
+            'NORIKS-STARTER': 'Starter paket', 'NORIKS-SOCKS': 'Nogavice',
+            'Tricka': 'Majica', 'Boxerky': 'Boksarice',
+            'bokserice': 'Boksarice', 'majica': 'Majica', 'majice': 'Majica'
+        };
+        
+        const colorHex = {
+            'Črna': '#1a1a1a', 'Modra': '#3b82f6', 'Bela': '#ffffff', 'Siva': '#6b7280',
+            'Rdeča': '#ef4444', 'Zelena': '#22c55e', 'Rjava': '#92400e', 'Bež': '#d4c5a9',
+            'Roza': '#ec4899', 'Oranžna': '#f97316', 'Vijolična': '#8b5cf6', 'Rumena': '#eab308',
+            'Turkizna': '#06b6d4', 'Temno modra': '#1e3a8a', 'Svetlo modra': '#93c5fd',
+            'Tamnoplava': '#1e3a8a', 'Smeđa': '#92400e'
+        };
+        
+        function translateColor(color) {
+            return colorTranslations[color.toLowerCase().trim()] || color;
+        }
+        
+        function getProductType(code, name) {
+            for (const [key, value] of Object.entries(productTypes)) {
+                if (code.toUpperCase().includes(key.toUpperCase())) return value;
+            }
+            for (const [key, value] of Object.entries(productTypes)) {
+                if (name.toLowerCase().includes(key.toLowerCase())) return value;
+            }
+            return '';
+        }
+        
+        // ========== DATA FETCHING ==========
+        function toggleDateFilter() {
+            const checkbox = document.getElementById('filter-today');
+            const dateInput = document.getElementById('filter-date');
+            if (checkbox.checked) {
+                dateInput.value = new Date().toISOString().split('T')[0];
+                dateInput.disabled = true;
+            } else {
+                dateInput.disabled = false;
+            }
+            refreshOrders();
+        }
+        
+        async function refreshOrders() {
+            const container = document.getElementById('orders-container');
+            container.innerHTML = '<div class="loading"><div class="loading-spinner"></div><p>Nalagam naročila...</p></div>';
+            
+            const status = document.getElementById('filter-status').value;
+            const date = document.getElementById('filter-date').value;
+            
+            try {
+                const response = await fetch(`/launches/api/packing/orders?status=${encodeURIComponent(status)}&date=${date || ''}`);
+                const data = await response.json();
+                
+                if (data.error) {
+                    container.innerHTML = `<div class="empty-state"><h3>Napaka</h3><p>${data.error}</p></div>`;
+                    return;
+                }
+                
+                window.allOrders = data.orders || [];
+                markOrdersSeen(window.allOrders);
+                logRefresh(newOrderIds.size);
+                filterByCountry();
+                
+            } catch (e) {
+                container.innerHTML = `<div class="empty-state"><h3>Napaka</h3><p>${e.message}</p></div>`;
+            }
+        }
+        
+        // ========== RENDERING ==========
+        function filterByCountry() {
+            const container = document.getElementById('orders-container');
+            const status = document.getElementById('filter-status').value;
+            
+            let orders = window.allOrders || [];
+            
+            if (selectedCountry) {
+                orders = orders.filter(o => o.country === selectedCountry);
+            }
+            
+            // Split into unpacked and packed
+            const unpacked = orders.filter(o => !isOrderPacked(o.id));
+            const packed = orders.filter(o => isOrderPacked(o.id));
+            
+            // Sort
+            const sortFn = (a, b) => {
+                const da = (a.date || '') + ' ' + (a.time || '');
+                const db = (b.date || '') + ' ' + (b.time || '');
+                return sortNewestFirst ? db.localeCompare(da) : da.localeCompare(db);
+            };
+            unpacked.sort(sortFn);
+            packed.sort(sortFn);
+            
+            // Update stats
+            document.getElementById('order-count').textContent = unpacked.length;
+            
+            let totalItems = 0;
+            unpacked.forEach(o => { o.items.forEach(i => totalItems += i.length); });
+            document.getElementById('item-count').textContent = totalItems;
+            
+            // Show/hide packed stats & button
+            const packedCount = packed.length;
+            document.getElementById('packed-count').textContent = packedCount;
+            document.getElementById('packed-stats').style.display = packedCount > 0 ? '' : 'none';
+            document.getElementById('toggle-packed-btn').style.display = packedCount > 0 ? '' : 'none';
+            
+            if (unpacked.length === 0 && (!showPacked || packed.length === 0)) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>✅ Ni naročil za pakiranje</h3>
+                        <p>Vsa naročila s statusom "${status}"${selectedCountry ? ` za ${selectedCountry}` : ''} so obdelana.</p>
+                        ${packedCount > 0 ? `<p style="margin-top:10px;"><button class="btn btn-secondary" onclick="toggleShowPacked()">Pokaži ${packedCount} spakiranih</button></p>` : ''}
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            
+            // Select all button
+            if (unpacked.length > 0) {
+                html += `<div style="grid-column: 1/-1; display:flex; gap:10px; align-items:center;" class="no-print">
+                    <button class="btn btn-secondary" onclick="selectAllVisible()" style="font-size:12px;">☑ Izberi vse (${unpacked.length})</button>
+                    ${selectedOrderIds.size > 0 ? `<button class="btn btn-secondary" onclick="clearSelection()" style="font-size:12px;">✕ Počisti izbor</button>` : ''}
+                </div>`;
+            }
+            
+            // Render unpacked orders
+            html += unpacked.map(order => renderOrderCard(order, false)).join('');
+            
+            // Render packed orders if showing
+            if (showPacked && packed.length > 0) {
+                html += `<div style="grid-column: 1/-1; border-top: 2px dashed #10b981; padding-top: 10px; margin-top: 10px;" class="no-print">
+                    <h3 style="color:#10b981; font-size:14px;">✅ Spakirano (${packed.length})</h3>
+                </div>`;
+                html += packed.map(order => renderOrderCard(order, true)).join('');
+            }
+            
+            container.innerHTML = html;
+        }
+        
+        function renderOrderCard(order, isPacked) {
+            const isSelected = selectedOrderIds.has(order.id);
+            const packedInfo = packedOrders[order.id];
+            
+            return `
+                <div class="order-card ${newOrderIds.has(order.id) ? 'new-order' : ''} ${isPacked ? 'packed' : ''} ${isSelected ? 'selected' : ''}" data-country="${order.country}" data-order-id="${order.id}">
+                    ${!isPacked ? `<input type="checkbox" class="order-select no-print" data-order-id="${order.id}" ${isSelected ? 'checked' : ''} onclick="toggleOrderSelect('${order.id}')">` : ''}
+                    <div class="order-header">
+                        <div>
+                            <div class="customer-name">
+                                ${order.customer}
+                                ${newOrderIds.has(order.id) ? '<span class="new-badge">NOV</span>' : ''}
+                                ${isPacked ? '<span class="packed-badge">✅ SPAKIRANO</span>' : ''}
+                            </div>
+                            <div class="order-price">
+                                ${parseFloat(order.total || 0).toFixed(2)} ${currencySymbols[order.currency] || order.currency}
+                                ${order.currency !== 'EUR' ? `<span class="order-price-eur">≈ ${(parseFloat(order.total || 0) * (toEurRates[order.currency] || 1)).toFixed(2)} €</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="order-meta">
+                            <div class="order-id">#${order.id}</div>
+                            <div>📥 ${order.orderDate} ${order.orderTime ? `<strong>${order.orderTime}</strong>` : ''}</div>
+                            ${order.shippedDate ? `<div>📦 ${order.shippedDate}</div>` : ''}
+                            <div>${countryFlags[order.country] || ''} ${order.country || ''}</div>
+                            ${isPacked && packedInfo ? `<div style="color:#10b981; margin-top:3px;">Spakirano: ${new Date(packedInfo.packedAt).toLocaleTimeString('sl-SI', {hour:'2-digit',minute:'2-digit'})}</div>` : ''}
+                            ${isPacked ? `<button class="btn btn-secondary no-print" onclick="unpackOrder('${order.id}')" style="font-size:10px; padding:2px 8px; margin-top:3px;">↩ Vrni</button>` : ''}
+                        </div>
+                    </div>
+                    <ul class="items-list">
+                        ${(order.products || order.items).map(product => {
+                            const rawItems = (product.items || (Array.isArray(product) ? product : [product])).slice().sort((a, b) => (a.type || '').localeCompare(b.type || '') || (a.color || '').localeCompare(b.color || ''));
+                            const grouped = [];
+                            rawItems.forEach(item => {
+                                const key = `${item.type}|${item.color}|${item.size}`;
+                                const existing = grouped.find(g => g.key === key);
+                                if (existing) { existing.count++; }
+                                else { grouped.push({ ...item, key, count: 1 }); }
+                            });
+                            const label = product.label || '';
+                            return (label ? `<li class="product-label">${label}</li>` : '') +
+                                grouped.map(item => `
+                                <li class="item">
+                                    <input type="checkbox" class="item-checkbox">
+                                    ${item.color ? `<div class="item-color" style="background: ${colorHex[item.color] || item.colorHex || '#ccc'}; ${item.color === 'Bela' ? 'border-color: #ccc;' : ''}"></div>` : ''}
+                                    <span class="item-name">${item.count > 1 ? item.count + 'x ' : ''}${item.color ? item.color + ' ' : ''}${item.type}</span>
+                                    <span class="item-size">${item.size}</span>
+                                </li>
+                            `).join('');
+                        }).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+        
+        // ========== INIT ==========
+        document.getElementById('filter-today').checked = false;
+        document.getElementById('filter-date').value = '';
+        document.getElementById('filter-date').disabled = false;
+        refreshOrders();
+        
+        setInterval(refreshOrders, 15 * 60 * 1000);
+        
+        // Refresh log
+        let refreshLog = JSON.parse(sessionStorage.getItem('packing-refresh-log') || '[]');
+        
+        function logRefresh(newCount) {
+            const time = new Date().toLocaleTimeString('sl-SI', { hour: '2-digit', minute: '2-digit' });
+            refreshLog.push({ time, newCount });
+            if (refreshLog.length > 20) refreshLog = refreshLog.slice(-20);
+            sessionStorage.setItem('packing-refresh-log', JSON.stringify(refreshLog));
+            updateRefreshBar();
+        }
+        
+        function updateRefreshBar() {
+            let bar = document.getElementById('refresh-bar');
+            if (!bar) {
+                bar = document.createElement('div');
+                bar.id = 'refresh-bar';
+                bar.style.cssText = 'background:#1a1a1a; color:#888; font-size:11px; padding:4px 20px; display:flex; gap:15px; flex-wrap:wrap; align-items:center;';
+                document.querySelector('.header').after(bar);
+            }
+            const items = refreshLog.map(r =>
+                `<span>${r.time}: <span style="color:${r.newCount > 0 ? '#f59e0b' : '#555'}; font-weight:${r.newCount > 0 ? '700' : '400'};">${r.newCount > 0 ? '+' + r.newCount + ' novih' : '0 novih'}</span></span>`
+            );
+            const nextRefresh = new Date(Date.now() + 15 * 60 * 1000).toLocaleTimeString('sl-SI', { hour: '2-digit', minute: '2-digit' });
+            bar.innerHTML = `<span style="color:#10b981;">⏱ Naslednji: ${nextRefresh}</span> ` + items.join('');
+        }
+        
+        // Click anywhere on order card to toggle selection
+        document.getElementById('orders-container').addEventListener('click', function(e) {
+            const card = e.target.closest('.order-card');
+            if (!card || card.classList.contains('packed')) return;
+            // Don't toggle if clicking button or item-checkbox
+            if (e.target.classList.contains('item-checkbox') || e.target.closest('button')) return;
+            // Prevent double-toggle from checkbox
+            if (e.target.classList.contains('order-select')) {
+                e.preventDefault();
+            }
+            const orderId = card.dataset.orderId;
+            if (orderId) toggleOrderSelect(orderId);
+        });
+    </script>
+</body>
+</html>
