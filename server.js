@@ -3409,24 +3409,59 @@ app.get('/api/packing/orders', async (req, res) => {
                     // Parse doc_desc to get individual items
                     const parsedItems = parseDocDesc(docDesc, code, name);
                     
+                    // Build product label with item count
+                    const totalItems = parsedItems.length * amount;
+                    const productLabel = (amount > 1 ? amount + 'x ' : '') + name + 
+                        (parsedItems.length > 0 ? ` (${amount > 1 ? amount + '×' + parsedItems.length + ' = ' : ''}${totalItems} kos)` : '');
+                    
                     if (parsedItems.length > 0) {
-                        return parsedItems;
+                        // Multiply by amount
+                        let allItems;
+                        if (amount > 1) {
+                            allItems = [];
+                            for (let a = 0; a < amount; a++) {
+                                allItems.push(...parsedItems.map(item => ({...item})));
+                            }
+                        } else {
+                            allItems = parsedItems;
+                        }
+                        // Validate items — flag warnings
+                        const knownSlovenianColors = ['Črna', 'Modra', 'Bela', 'Siva', 'Zelena', 'Rdeča', 'Rjava', 'Bež', 'Roza', 'Oranžna', 'Vijolična', 'Rumena', 'Turkizna', 'Temno modra', 'Svetlo modra', 'Tamnoplava', 'Smeđa', 'Črna & Bela', ''];
+                        const knownTypes = ['Majica', 'Boksarice', 'Starter paket', 'Nogavice', ''];
+                        for (const item of allItems) {
+                            const warnings = [];
+                            if (item.color && !knownSlovenianColors.includes(item.color)) {
+                                warnings.push(`Neprevedena barva: "${item.color}"`);
+                            }
+                            if (item.type && !knownTypes.includes(item.type) && !item.type.startsWith('Nogavice')) {
+                                warnings.push(`Neprepoznan tip: "${item.type}"`);
+                            }
+                            if (!item.color && !item.type.startsWith('Nogavice')) {
+                                warnings.push('Manjka barva');
+                            }
+                            if (!item.size) {
+                                warnings.push('Manjka velikost');
+                            }
+                            if (warnings.length > 0) item.warnings = warnings;
+                        }
+                        return { label: productLabel, items: allItems };
                     }
                     
-                    // Fallback: use product name directly
-                    return [{
-                        type: name,
-                        color: '',
-                        size: '',
-                        colorHex: '#ccc'
-                    }];
+                    // Fallback — flag as warning (no parsed data!)
+                    const fallbackItems = [];
+                    for (let a = 0; a < amount; a++) {
+                        fallbackItems.push({ type: name, color: '', size: '', colorHex: '#ccc', warnings: ['Ni bilo mogoče parsati izdelkov — preverite ročno!'] });
+                    }
+                    return { label: productLabel, items: fallbackItems };
                 });
             
             // Parse date and time
             let dateStr = '';
             let timeStr = '';
-            if (order.doc_date) {
-                dateStr = order.doc_date.split('+')[0].split('T')[0];
+            // Prefer shipped_date for "Odpremljen" orders, fallback to doc_date
+            const dateSource = order.shipped_date || order.doc_date;
+            if (dateSource) {
+                dateStr = dateSource.split('+')[0].split('T')[0];
             }
             // Get time from order_create_ts (e.g., "2026-02-26T13:04:57+02:00")
             if (order.order_create_ts) {
@@ -3434,16 +3469,33 @@ app.get('/api/packing/orders', async (req, res) => {
                 if (match) timeStr = match[1];
             }
             
+            // Order created date/time
+            let orderDate = '', orderTime = '';
+            if (order.order_create_ts) {
+                const parts = order.order_create_ts.split('+')[0].split('T');
+                orderDate = parts[0] || '';
+                orderTime = parts[1] ? parts[1].substring(0, 5) : '';
+            }
+            // Shipped date
+            let shippedDate = '';
+            if (order.shipped_date) {
+                shippedDate = order.shipped_date.split('+')[0].split('T')[0];
+            }
+            
             return {
                 id: order.count_code,
                 customer: customerName,
                 date: dateStr,
                 time: timeStr,
+                orderDate: orderDate,
+                orderTime: orderTime,
+                shippedDate: shippedDate,
                 country: country,
                 status: order.status_code,
                 currency: order.currency_code || 'EUR',
                 total: order.sum_all || '0',
-                items: items
+                products: items, // [{label, items: [...]}]
+                items: items.map(p => p.items || p) // flat for backward compat
             };
         });
         
@@ -3482,51 +3534,271 @@ const bundleContents = {
         { type: 'Majica', color: 'Bela', size },
         { type: 'Majica', color: 'Bela', size },
     ],
-    // Coastal 3-pack (blue, green, white boxers)
+    // Midnight/Ponoćni Mix 3-pack SHIRTS (črna, siva, temno modra — verified from WC image)
+    'NORIKS-MIDNIGHT-3-PACK': (size) => [
+        { type: 'Majica', color: 'Črna', size },
+        { type: 'Majica', color: 'Siva', size },
+        { type: 'Majica', color: 'Temno modra', size },
+    ],
+    // Urban-Earth/Urbano-Zemljani 3-pack SHIRTS (zelena, siva, temno modra — verified from WC image)
+    'NORIKS-URBAN-3-PACK': (size) => [
+        { type: 'Majica', color: 'Zelena', size },
+        { type: 'Majica', color: 'Siva', size },
+        { type: 'Majica', color: 'Temno modra', size },
+    ],
+    // Coastal 3-pack (blue, green, white SHIRTS — verified from WC categories)
     'NORIKS-COASTAL-3-PACK': (size) => [
-        { type: 'Boksarice', color: 'Modra', size },
-        { type: 'Boksarice', color: 'Zelena', size },
-        { type: 'Boksarice', color: 'Bela', size },
+        { type: 'Majica', color: 'Modra', size },
+        { type: 'Majica', color: 'Zelena', size },
+        { type: 'Majica', color: 'Bela', size },
     ],
-    // Monochrome 3-pack (black, white, grey boxers)
+    // Monochrome 3-pack (black, white, grey SHIRTS - not boxers!)
     'NORIKS-MONOCHROME-3-PACK': (size) => [
-        { type: 'Boksarice', color: 'Črna', size },
-        { type: 'Boksarice', color: 'Bela', size },
-        { type: 'Boksarice', color: 'Siva', size },
+        { type: 'Majica', color: 'Črna', size },
+        { type: 'Majica', color: 'Bela', size },
+        { type: 'Majica', color: 'Siva', size },
     ],
-    // City combo 6-pack (3 boxers + 3 shirts, mixed)
+    // City combo 6-pack (6 SHIRTS — verified from WC: category "6-paket majice")
     'NORIKS-CITY-COMBO-6-PACK': (size) => [
-        { type: 'Boksarice', color: 'Črna', size },
-        { type: 'Boksarice', color: 'Modra', size },
-        { type: 'Boksarice', color: 'Siva', size },
         { type: 'Majica', color: 'Črna', size },
         { type: 'Majica', color: 'Bela', size },
         { type: 'Majica', color: 'Modra', size },
+        { type: 'Majica', color: 'Siva', size },
+        { type: 'Majica', color: 'Zelena', size },
+        { type: 'Majica', color: 'Temno modra', size },
     ],
-    // Neutral mix 9-pack
-    'NORIKS-NEUTRAL-MIX-9-PACK': (size) => [
+    // Ponoćni mix 7-pack (2x crna, 2x siva, 3x modra boksarice)
+    'NORIKS-BOX-BUNDLE-7-SECOND': (size) => [
         { type: 'Boksarice', color: 'Črna', size },
-        { type: 'Boksarice', color: 'Bela', size },
+        { type: 'Boksarice', color: 'Črna', size },
         { type: 'Boksarice', color: 'Siva', size },
+        { type: 'Boksarice', color: 'Siva', size },
+        { type: 'Boksarice', color: 'Modra', size },
+        { type: 'Boksarice', color: 'Modra', size },
+        { type: 'Boksarice', color: 'Modra', size },
+    ],
+    // ========== SHIRT PACKS (verified from WC product images) ==========
+    // Neutral mix 9-pack: image shows 6 unique colors, 9 total = 3 extra of core colors
+    // Colors from image: črna, siva, tamnoplava, zelena, smeđa, bela + 3 extra (črna, bela, siva)
+    'NORIKS-NEUTRAL-MIX-9-PACK': (size) => [
+        { type: 'Majica', color: 'Črna', size },
+        { type: 'Majica', color: 'Črna', size },
+        { type: 'Majica', color: 'Bela', size },
+        { type: 'Majica', color: 'Bela', size },
+        { type: 'Majica', color: 'Siva', size },
+        { type: 'Majica', color: 'Siva', size },
+        { type: 'Majica', color: 'Tamnoplava', size },
+        { type: 'Majica', color: 'Smeđa', size },
+        { type: 'Majica', color: 'Zelena', size },
+    ],
+    // Full spectrum 9-pack: image = 2x črna, 1x siva, 1x tamnoplava, 1x zelena, 1x smeđa, 1x bež, 1x bela + 1 extra
+    'NORIKS-FULL-SPECTRUM-9-PACK': (size) => [
+        { type: 'Majica', color: 'Črna', size },
+        { type: 'Majica', color: 'Črna', size },
+        { type: 'Majica', color: 'Siva', size },
+        { type: 'Majica', color: 'Tamnoplava', size },
+        { type: 'Majica', color: 'Zelena', size },
+        { type: 'Majica', color: 'Smeđa', size },
+        { type: 'Majica', color: 'Bež', size },
+        { type: 'Majica', color: 'Bela', size },
+        { type: 'Majica', color: 'Bela', size },
+    ],
+    // Street pack 9-pack: image = 2x črna, 1x siva, 1x tamnoplava, 1x zelena, 1x smeđa, 1x bež, 1x bela + 1 extra
+    'NORIKS-STREET-PACK-9-PACK': (size) => [
+        { type: 'Majica', color: 'Črna', size },
+        { type: 'Majica', color: 'Črna', size },
+        { type: 'Majica', color: 'Siva', size },
+        { type: 'Majica', color: 'Tamnoplava', size },
+        { type: 'Majica', color: 'Zelena', size },
+        { type: 'Majica', color: 'Smeđa', size },
+        { type: 'Majica', color: 'Bež', size },
+        { type: 'Majica', color: 'Bela', size },
+        { type: 'Majica', color: 'Bela', size },
+    ],
+    // Monochrome 9-pack: image = 3x črna, 3x siva, 3x bela
+    'NORIKS-MONOCHROME-9-PACK': (size) => [
+        { type: 'Majica', color: 'Črna', size },
+        { type: 'Majica', color: 'Črna', size },
+        { type: 'Majica', color: 'Črna', size },
+        { type: 'Majica', color: 'Siva', size },
+        { type: 'Majica', color: 'Siva', size },
+        { type: 'Majica', color: 'Siva', size },
+        { type: 'Majica', color: 'Bela', size },
+        { type: 'Majica', color: 'Bela', size },
+        { type: 'Majica', color: 'Bela', size },
+    ],
+    // All black shirts 3/6/9/12/15
+    'NORIKS-ALL-BLACK-3-PACK': (size) => Array(3).fill(null).map(() => ({ type: 'Majica', color: 'Črna', size })),
+    'NORIKS-ALL-BLACK-6-PACK': (size) => Array(6).fill(null).map(() => ({ type: 'Majica', color: 'Črna', size })),
+    'NORIKS-ALL-BLACK-9-PACK': (size) => Array(9).fill(null).map(() => ({ type: 'Majica', color: 'Črna', size })),
+    'NORIKS-ALL-BLACK-12-PACK': (size) => Array(12).fill(null).map(() => ({ type: 'Majica', color: 'Črna', size })),
+    'NORIKS-ALL-BLACK-15-PACK': (size) => Array(15).fill(null).map(() => ({ type: 'Majica', color: 'Črna', size })),
+    // All white shirts 3/6/9/12/15
+    'NORIKS-ALL-WHITE-3-PACK': (size) => Array(3).fill(null).map(() => ({ type: 'Majica', color: 'Bela', size })),
+    'NORIKS-ALL-WHITE-6-PACK': (size) => Array(6).fill(null).map(() => ({ type: 'Majica', color: 'Bela', size })),
+    'NORIKS-ALL-WHITE-9-PACK': (size) => Array(9).fill(null).map(() => ({ type: 'Majica', color: 'Bela', size })),
+    'NORIKS-ALL-WHITE-12-PACK': (size) => Array(12).fill(null).map(() => ({ type: 'Majica', color: 'Bela', size })),
+    'NORIKS-ALL-WHITE-15-PACK': (size) => Array(15).fill(null).map(() => ({ type: 'Majica', color: 'Bela', size })),
+    // Monochrome 6-pack: 3x črna, 3x bela
+    'NORIKS-MONOCHROME-6-PACK': (size) => [
+        ...Array(3).fill(null).map(() => ({ type: 'Majica', color: 'Črna', size })),
+        ...Array(3).fill(null).map(() => ({ type: 'Majica', color: 'Bela', size })),
+    ],
+    // Monochrome dozen 12-pack: 6x črna, 6x bela
+    'NORIKS-MONOCHROME-DOZEN': (size) => [
+        ...Array(6).fill(null).map(() => ({ type: 'Majica', color: 'Črna', size })),
+        ...Array(6).fill(null).map(() => ({ type: 'Majica', color: 'Bela', size })),
+    ],
+    // Earth dozen 12-pack: image = 6x črna, 1x tamnoplava, 2x bež, 3x zelena
+    'NORIKS-EARTH-DOZEN': (size) => [
+        ...Array(6).fill(null).map(() => ({ type: 'Majica', color: 'Črna', size })),
+        { type: 'Majica', color: 'Tamnoplava', size },
+        ...Array(2).fill(null).map(() => ({ type: 'Majica', color: 'Bež', size })),
+        ...Array(3).fill(null).map(() => ({ type: 'Majica', color: 'Zelena', size })),
+    ],
+    // Everyday mix 12-pack: image = 2x each of črna, zelena, tamnoplava, siva, bež, bela
+    'NORIKS-EVERYDAY-MIX-12-PACK': (size) => [
+        ...Array(2).fill(null).map(() => ({ type: 'Majica', color: 'Črna', size })),
+        ...Array(2).fill(null).map(() => ({ type: 'Majica', color: 'Zelena', size })),
+        ...Array(2).fill(null).map(() => ({ type: 'Majica', color: 'Tamnoplava', size })),
+        ...Array(2).fill(null).map(() => ({ type: 'Majica', color: 'Siva', size })),
+        ...Array(2).fill(null).map(() => ({ type: 'Majica', color: 'Bež', size })),
+        ...Array(2).fill(null).map(() => ({ type: 'Majica', color: 'Bela', size })),
+    ],
+    // Full basics 12-pack: image = 3x črna, 2x siva, 2x tamnoplava, 1x smeđa, 1x bež, 1x zelena, 2x bela
+    'NORIKS-FULL-BASICS-12-PACK': (size) => [
+        ...Array(3).fill(null).map(() => ({ type: 'Majica', color: 'Črna', size })),
+        ...Array(2).fill(null).map(() => ({ type: 'Majica', color: 'Siva', size })),
+        ...Array(2).fill(null).map(() => ({ type: 'Majica', color: 'Tamnoplava', size })),
+        { type: 'Majica', color: 'Smeđa', size },
+        { type: 'Majica', color: 'Bež', size },
+        { type: 'Majica', color: 'Zelena', size },
+        ...Array(2).fill(null).map(() => ({ type: 'Majica', color: 'Bela', size })),
+    ],
+    // Full basics 15-pack: image = 3x črna, 2x tamnoplava, 1x zelena, 2x siva, 2x smeđa, 2x bež, 3x bela
+    'NORIKS-FULL-BASICS-15-PACK': (size) => [
+        ...Array(3).fill(null).map(() => ({ type: 'Majica', color: 'Črna', size })),
+        ...Array(2).fill(null).map(() => ({ type: 'Majica', color: 'Tamnoplava', size })),
+        { type: 'Majica', color: 'Zelena', size },
+        ...Array(2).fill(null).map(() => ({ type: 'Majica', color: 'Siva', size })),
+        ...Array(2).fill(null).map(() => ({ type: 'Majica', color: 'Smeđa', size })),
+        ...Array(2).fill(null).map(() => ({ type: 'Majica', color: 'Bež', size })),
+        ...Array(3).fill(null).map(() => ({ type: 'Majica', color: 'Bela', size })),
+    ],
+    // ========== BOXER PACKS (3-packs) ==========
+    // Ponoćni mix 3-pack (1x crna, 2x modra)
+    'NORIKS-BOX-BUNDLE-3-THIRD': (size) => [
+        { type: 'Boksarice', color: 'Črna', size },
+        { type: 'Boksarice', color: 'Modra', size },
+        { type: 'Boksarice', color: 'Modra', size },
+    ],
+    // Urbano-zemljani 3-pack (1x crna, 1x zelena, 1x siva)
+    'NORIKS-BOX-BUNDLE-3-SECOND': (size) => [
+        { type: 'Boksarice', color: 'Črna', size },
+        { type: 'Boksarice', color: 'Zelena', size },
+        { type: 'Boksarice', color: 'Siva', size },
+    ],
+    // Monokromni 3-pack boxers (1x siva, 1x modra, 1x crna — verified from WC)
+    'NORIKS-BOX-BUNDLE-3-FIRST': (size) => [
+        { type: 'Boksarice', color: 'Siva', size },
+        { type: 'Boksarice', color: 'Modra', size },
+        { type: 'Boksarice', color: 'Črna', size },
+    ],
+    // ========== BOXER PACKS (larger) ==========
+    // Urbano-zemljani 7-pack (2x crne, 2x plave, 2x zelene, 1x siva)
+    'NORIKS-BOX-BUNDLE-7-FIRST': (size) => [
+        { type: 'Boksarice', color: 'Črna', size },
+        { type: 'Boksarice', color: 'Črna', size },
+        { type: 'Boksarice', color: 'Modra', size },
         { type: 'Boksarice', color: 'Modra', size },
         { type: 'Boksarice', color: 'Zelena', size },
+        { type: 'Boksarice', color: 'Zelena', size },
+        { type: 'Boksarice', color: 'Siva', size },
+    ],
+    // Ponoćni mix 5-pack (2x crne, 3x modre)
+    'NORIKS-BOX-BUNDLE-5-FIRST': (size) => [
         { type: 'Boksarice', color: 'Črna', size },
-        { type: 'Boksarice', color: 'Bela', size },
+        { type: 'Boksarice', color: 'Črna', size },
+        { type: 'Boksarice', color: 'Modra', size },
+        { type: 'Boksarice', color: 'Modra', size },
+        { type: 'Boksarice', color: 'Modra', size },
+    ],
+    // Urbano-zemljani 5-pack (2x sive, 2x crne, 1x zelena)
+    'NORIKS-BOX-BUNDLE-5-SECOND': (size) => [
+        { type: 'Boksarice', color: 'Siva', size },
+        { type: 'Boksarice', color: 'Siva', size },
+        { type: 'Boksarice', color: 'Črna', size },
+        { type: 'Boksarice', color: 'Črna', size },
+        { type: 'Boksarice', color: 'Zelena', size },
+    ],
+    // Black 7/10/15 packs
+    'NORIKS-BOX-BLACK-7-PACK': (size) => Array(7).fill(null).map(() => ({ type: 'Boksarice', color: 'Črna', size })),
+    'NORIKS-BOX-BLACK-10-PACK': (size) => Array(10).fill(null).map(() => ({ type: 'Boksarice', color: 'Črna', size })),
+    'NORIKS-BOX-BLACK-15-PACK': (size) => Array(15).fill(null).map(() => ({ type: 'Boksarice', color: 'Črna', size })),
+    // Miješani 10-pack (2x crne, 2x sive, 2x modre, 2x zelene, 2x bele)
+    'NORIKS-BOX-BLACK-7-PACK-2': (size) => [
+        { type: 'Boksarice', color: 'Črna', size },
+        { type: 'Boksarice', color: 'Črna', size },
+        { type: 'Boksarice', color: 'Siva', size },
         { type: 'Boksarice', color: 'Siva', size },
         { type: 'Boksarice', color: 'Modra', size },
+        { type: 'Boksarice', color: 'Modra', size },
+        { type: 'Boksarice', color: 'Zelena', size },
+        { type: 'Boksarice', color: 'Zelena', size },
+        { type: 'Boksarice', color: 'Bela', size },
+        { type: 'Boksarice', color: 'Bela', size },
+    ],
+    // Tamni 10-pack (5x crne, 5x plave)
+    'NORIKS-BOX-BLACK-7-PACK-3': (size) => [
+        ...Array(5).fill(null).map(() => ({ type: 'Boksarice', color: 'Črna', size })),
+        ...Array(5).fill(null).map(() => ({ type: 'Boksarice', color: 'Modra', size })),
+    ],
+    // Miješani 15-pack (5x crne, 3x plave, 3x sive, 2x zelene, 2x bele)
+    'NORIKS-BOX-BUNDLE-15-FIRST': (size) => [
+        ...Array(5).fill(null).map(() => ({ type: 'Boksarice', color: 'Črna', size })),
+        ...Array(3).fill(null).map(() => ({ type: 'Boksarice', color: 'Modra', size })),
+        ...Array(3).fill(null).map(() => ({ type: 'Boksarice', color: 'Siva', size })),
+        ...Array(2).fill(null).map(() => ({ type: 'Boksarice', color: 'Zelena', size })),
+        ...Array(2).fill(null).map(() => ({ type: 'Boksarice', color: 'Bela', size })),
+    ],
+    // Tamni 15-pack (10x crne, 5x plave)
+    'NORIKS-BOX-BUNDLE-15-SECOND': (size) => [
+        ...Array(10).fill(null).map(() => ({ type: 'Boksarice', color: 'Črna', size })),
+        ...Array(5).fill(null).map(() => ({ type: 'Boksarice', color: 'Modra', size })),
     ],
 };
 
 // Type translations for doc_desc parsing (multi-language)
 const typeTranslations = {
     'Tricka': 'Majica', 'Boxerky': 'Boksarice', 'Tričko': 'Majica',
-    'Koszulka': 'Majica', 'Póló': 'Majica', 'Maglietta': 'Majica',
-    'Majica': 'Majica', 'Bokserica': 'Boksarice', 'Boksarice': 'Boksarice',
+    'Boxerky 1': 'Boksarice', 'Boxerky 2': 'Boksarice', 'Boxerky 3': 'Boksarice',
+    'Tricka 1': 'Majica', 'Tricka 2': 'Majica', 'Tricka 3': 'Majica',
+    'Koszulka': 'Majica', 'Koszulka 1': 'Majica', 'Koszulka 2': 'Majica',
+    'Bokserki 1': 'Boksarice', 'Bokserki 2': 'Boksarice',
+    'Póló': 'Majica', 'Póló 1': 'Majica', 'Póló 2': 'Majica',
+    'Maglietta': 'Majica', 'Boxer': 'Boksarice',
+    'Majica': 'Majica', 'Majica 1': 'Majica', 'Majica 2': 'Majica',
+    'Bokserica': 'Boksarice', 'Bokserica 1': 'Boksarice', 'Bokserica 2': 'Boksarice',
+    'Boksarice': 'Boksarice',
     'Μπλούζα': 'Majica', 'Μπλούζα 1': 'Majica', 'Μπλούζα 2': 'Majica',
-    'Μπόξερ': 'Boksarice', 'Tshirt': 'Majica', 'Boxer': 'Boksarice',
-    'Shirt': 'Majica', 'T-shirt': 'Majica',
+    'Μπόξερ': 'Boksarice', 'Μπόξερ 1': 'Boksarice', 'Μπόξερ 2': 'Boksarice',
+    'Tshirt': 'Majica', 'Shirt': 'Majica', 'T-shirt': 'Majica',
     'majica': 'Majica', 'bokserica': 'Boksarice',
     'Koszulki': 'Majica', 'Bokserki': 'Boksarice',
+    // Czech with háčky
+    'Trička': 'Majica', 'Trička 1': 'Majica', 'Trička 2': 'Majica', 'Trička 3': 'Majica',
+    'Tričko': 'Majica', 'Tričko 1': 'Majica', 'Tričko 2': 'Majica',
+    // Hungarian
+    'Póló': 'Majica', 'Póló 1': 'Majica', 'Póló 2': 'Majica', 'Póló 3': 'Majica',
+    'Alsónadrág': 'Boksarice', 'Alsónadrág 1': 'Boksarice', 'Alsónadrág 2': 'Boksarice',
+    'Boxer': 'Boksarice', 'Boxer 1': 'Boksarice', 'Boxer 2': 'Boksarice',
+    // Italian
+    'Maglietta': 'Majica', 'Maglietta 1': 'Majica', 'Maglietta 2': 'Majica',
+    'Boxer': 'Boksarice',
+    // Greek extended
+    'Μπλούζα': 'Majica', 'Μπλούζα 1': 'Majica', 'Μπλούζα 2': 'Majica', 'Μπλούζα 3': 'Majica',
+    'Μπόξερ': 'Boksarice', 'Μπόξερ 1': 'Boksarice', 'Μπόξερ 2': 'Boksarice', 'Μπόξερ 3': 'Boksarice',
+    'Μπόξερ 2 2': 'Boksarice',
 };
 
 // Color translations for doc_desc (multi-language → Slovenian)
@@ -3547,19 +3819,64 @@ const colorTranslationsServer = {
     // Hungarian
     'fekete': 'Črna', 'kék': 'Modra', 'kek': 'Modra', 'fehér': 'Bela', 'feher': 'Bela',
     'szürke': 'Siva', 'szurke': 'Siva', 'piros': 'Rdeča', 'zöld': 'Zelena', 'zold': 'Zelena',
-    // Greek
-    'Μαύρο': 'Črna', 'Μπλε': 'Modra', 'Λευκό': 'Bela', 'Γκρι': 'Siva',
-    'Σκούρο μπλε': 'Temno modra', 'Πράσινο': 'Zelena', 'Κόκκινο': 'Rdeča',
-    // Italian
+    // Hungarian (extended)
+    'barna': 'Rjava', 'bézs': 'Bež', 'bezs': 'Bež', 'sötétkék': 'Temno modra', 'sotetkek': 'Temno modra',
+    'rózsaszín': 'Roza', 'rozsaszin': 'Roza', 'narancssárga': 'Oranžna', 'narancssarga': 'Oranžna',
+    'lila': 'Vijolična', 'sárga': 'Rumena', 'sarga': 'Rumena', 'türkiz': 'Turkizna', 'turkiz': 'Turkizna',
+    // Greek (extended)
+    'Μαύρο': 'Črna', 'μαύρο': 'Črna', 'Μπλε': 'Modra', 'μπλε': 'Modra',
+    'Λευκό': 'Bela', 'λευκό': 'Bela', 'Γκρι': 'Siva', 'γκρι': 'Siva',
+    'Σκούρο μπλε': 'Temno modra', 'σκούρο μπλε': 'Temno modra',
+    'Πράσινο': 'Zelena', 'πράσινο': 'Zelena', 'Κόκκινο': 'Rdeča', 'κόκκινο': 'Rdeča',
+    'Μπεζ': 'Bež', 'μπεζ': 'Bež', 'Καφέ': 'Rjava', 'καφέ': 'Rjava',
+    'Κίτρινο': 'Rumena', 'κίτρινο': 'Rumena', 'Ροζ': 'Roza', 'ροζ': 'Roza',
+    'Μωβ': 'Vijolična', 'μωβ': 'Vijolična', 'Τυρκουάζ': 'Turkizna', 'τυρκουάζ': 'Turkizna',
+    // Italian (extended)
     'nero': 'Črna', 'nera': 'Črna', 'blu': 'Modra', 'bianco': 'Bela', 'bianca': 'Bela',
-    'grigio': 'Siva', 'grigia': 'Siva', 'rosso': 'Rdeča', 'verde': 'Zelena',
+    'grigio': 'Siva', 'grigia': 'Siva', 'rosso': 'Rdeča', 'rossa': 'Rdeča', 'verde': 'Zelena',
+    'blu scuro': 'Temno modra', 'Blu scuro': 'Temno modra',
+    'marrone': 'Rjava', 'beige': 'Bež', 'rosa': 'Roza', 'arancione': 'Oranžna',
+    'viola': 'Vijolična', 'giallo': 'Rumena', 'gialla': 'Rumena', 'turchese': 'Turkizna',
+    // Czech/Slovak extended
+    'sivá': 'Siva', 'tmavě modrá': 'Temno modra', 'Tmavě modrá': 'Temno modra',
+    'tmavě modrý': 'Temno modra', 'hnědá': 'Rjava', 'hneda': 'Rjava',
+    'béžová': 'Bež', 'bezova': 'Bež', 'růžová': 'Roza', 'ruzova': 'Roza',
+    'oranžová': 'Oranžna', 'oranzova': 'Oranžna', 'fialová': 'Vijolična', 'fialova': 'Vijolična',
+    'žlutá': 'Rumena', 'zluta': 'Rumena', 'tyrkysová': 'Turkizna', 'tyrkysova': 'Turkizna',
+    'tmavomodrá': 'Temno modra', 'tmavomodra': 'Temno modra',
+    'svetlomodrá': 'Svetlo modra', 'svetlomodra': 'Svetlo modra',
+    // Croatian extended
+    'smeđa': 'Rjava', 'smeda': 'Rjava', 'bež': 'Bež', 'tamnoplava': 'Temno modra',
+    'narančasta': 'Oranžna', 'narancasta': 'Oranžna', 'ljubičasta': 'Vijolična', 'ljubicasta': 'Vijolična',
+    'žuta': 'Rumena', 'zuta': 'Rumena', 'tirkizna': 'Turkizna', 'tamno plava': 'Temno modra',
+    // Polish extended
+    'brązowy': 'Rjava', 'brazowy': 'Rjava', 'beżowy': 'Bež', 'bezowy': 'Bež',
+    'różowy': 'Roza', 'rozowy': 'Roza', 'pomarańczowy': 'Oranžna', 'pomaranczowy': 'Oranžna',
+    'fioletowy': 'Vijolična', 'żółty': 'Rumena', 'zolty': 'Rumena',
+    'granatowy': 'Temno modra', 'turkusowy': 'Turkizna',
     // Slovenian (pass through)
     'Črna': 'Črna', 'Modra': 'Modra', 'Bela': 'Bela', 'Siva': 'Siva',
-    'Zelena': 'Zelena', 'Rdeča': 'Rdeča',
+    'Zelena': 'Zelena', 'Rdeča': 'Rdeča', 'Rjava': 'Rjava', 'Bež': 'Bež',
+    'Temno modra': 'Temno modra', 'Tamnoplava': 'Temno modra', 'Smeđa': 'Rjava',
+    'Roza': 'Roza', 'Oranžna': 'Oranžna', 'Vijolična': 'Vijolična', 'Rumena': 'Rumena',
+    'Turkizna': 'Turkizna', 'Svetlo modra': 'Svetlo modra',
 };
 
 function translateColorServer(color) {
-    return colorTranslationsServer[color] || colorTranslationsServer[color.toLowerCase()] || color;
+    if (!color) return '';
+    const trimmed = color.trim();
+    // Direct match
+    if (colorTranslationsServer[trimmed]) return colorTranslationsServer[trimmed];
+    // Lowercase match
+    const lower = trimmed.toLowerCase();
+    if (colorTranslationsServer[lower]) return colorTranslationsServer[lower];
+    // Unicode normalized match (strip accents for lookup)
+    const normalized = lower.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    for (const [key, value] of Object.entries(colorTranslationsServer)) {
+        const keyNorm = key.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        if (keyNorm === normalized) return value;
+    }
+    return trimmed;
 }
 
 // Helper: Parse doc_desc field to extract items
@@ -3570,7 +3887,7 @@ function parseDocDesc(docDesc, productCode, productName) {
     // Extract size from doc_desc or product code
     let bundleSize = '';
     if (docDesc) {
-        const sizeMatch = docDesc.match(/(?:velicina|rozmiar|size|méret|velikost|megethos|velicina-majice|velicina-bokseric)\s*:\s*(\S+)/i);
+        const sizeMatch = docDesc.match(/(?:velicina|rozmiar|size|méret|velikost|megethos|velicina-majice|velicina-bokseric|megethos-mployzakia|megethos-mpoxer|meret|rozmer)\s*:\s*(\S+)/i);
         if (sizeMatch) bundleSize = sizeMatch[1].toUpperCase();
     }
     if (!bundleSize) {
@@ -3586,20 +3903,117 @@ function parseDocDesc(docDesc, productCode, productName) {
         return bundleFn(bundleSize);
     }
     
+    // Handle single product codes (e.g., NORIKS-ONE-DARKBLUE-4XL)
+    const singleProductColors = {
+        'ONE-DARKBLUE': 'Temno modra', 'ONE-BLACK': 'Črna', 'ONE-WHITE': 'Bela',
+        'ONE-GREY': 'Siva', 'ONE-GREEN': 'Zelena', 'ONE-BLUE': 'Modra',
+        'ONE-BROWN': 'Rjava', 'ONE-BEIGE': 'Bež', 'ONE-RED': 'Rdeča',
+    };
+    for (const [key, color] of Object.entries(singleProductColors)) {
+        if (code.includes(key)) {
+            return [{ type: productType || 'Majica', color, size: bundleSize }];
+        }
+    }
+    
+    // Handle socks — always show as 1 komplet (e.g., "1x Nogavice (5 parov)")
+    if (code.includes('SOCKS')) {
+        let pairCount = 1;
+        const pcMatch = code.match(/(\d+)PC/i);
+        if (pcMatch) pairCount = parseInt(pcMatch[1]);
+        const nameMatch = productName.match(/(\d+)\s*par/i);
+        if (nameMatch) pairCount = parseInt(nameMatch[1]);
+        
+        const sizeFromDesc = docDesc.match(/(?:velikost|velicina|rozmiar|size|méret|meret)\s*:\s*(\S+)/i);
+        const sockSize = sizeFromDesc ? sizeFromDesc[1] : bundleSize || '';
+        
+        // Determine color from code
+        let sockColor = 'Črna'; // default
+        if (code.includes('BW')) sockColor = 'Črna & Bela';
+        else if (code.includes('WHITE')) sockColor = 'Bela';
+        else if (code.includes('BLACK')) sockColor = 'Črna';
+        
+        // Return as single item showing komplet
+        return [{ type: `Nogavice (${pairCount} parov)`, color: sockColor, size: sockSize }];
+        // Note: previously returned individual pairs which was confusing for packing
+    }
+    
     // Handle BUNDLE products with dual sizes (shirts + boxers)
     if (code.includes('BUNDLE-SHIRTS-BOX') || code.includes('BUNDLE-SH-BOX')) {
         const items = [];
         if (docDesc) {
-            const shirtSize = docDesc.match(/velicina-majice\s*:\s*(\S+)/i);
-            const boxerSize = docDesc.match(/velicina-bokseric\s*:\s*(\S+)/i);
-            // Parse number of shirts and boxers from code: P-3-X means pattern 3
-            // Default: 2 shirts + 5 boxers based on product names
+            // Match various language patterns for shirt/boxer sizes
+            const shirtSize = docDesc.match(/(?:velicina-majice|megethos-mployzakia|rozmiar-koszulki|meret-polo)\s*:\s*(\S+)/i);
+            const boxerSize = docDesc.match(/(?:velicina-bokseric|megethos-mpoxer|rozmiar-bokserki|meret-boxer)\s*:\s*(\S+)/i);
             const sSize = shirtSize ? shirtSize[1].toUpperCase() : bundleSize;
             const bSize = boxerSize ? boxerSize[1].toUpperCase() : bundleSize;
-            items.push({ type: 'Majica', color: 'Črna', size: sSize });
-            items.push({ type: 'Majica', color: 'Bela', size: sSize });
-            for (let n = 0; n < 5; n++) {
-                items.push({ type: 'Boksarice', color: ['Črna', 'Modra', 'Siva', 'Zelena', 'Bela'][n], size: bSize });
+            
+            // Parse shirt and boxer counts - prefer product name over code
+            let numShirts = 2, numBoxers = 5;
+            const nameCountMatch = productName.match(/(\d+)\s*(?:majic|μπλουζ|koszul|tričk|póló|shirt)/i);
+            const nameBoxerMatch = productName.match(/(\d+)\s*(?:bokser|μπόξερ|boxer)/i);
+            if (nameCountMatch) numShirts = parseInt(nameCountMatch[1]);
+            if (nameBoxerMatch) numBoxers = parseInt(nameBoxerMatch[1]);
+            
+            // Bundle color definitions by variant code (verified from WooCommerce descriptions)
+            // 2+5 bundles:
+            const bundleVariants_2_5 = {
+                'P-1': { shirts: ['Črna', 'Bela'], boxers: ['Črna', 'Siva', 'Modra', 'Zelena', 'Rdeča'] },
+                'P-2': { shirts: ['Črna', 'Modra'], boxers: ['Črna', 'Siva', 'Modra', 'Zelena', 'Rdeča'] },
+                'P-3': { shirts: ['Siva', 'Bela'], boxers: ['Črna', 'Siva', 'Modra', 'Zelena', 'Rdeča'] },
+                'P-4': { shirts: ['Črna', 'Siva'], boxers: ['Črna', 'Siva', 'Modra', 'Zelena', 'Rdeča'] },
+            };
+            // 5+5 bundles (verified from WC descriptions):
+            const bundleVariants_5_5 = {
+                'P-1': { shirts: ['Črna', 'Črna', 'Siva', 'Siva', 'Temno modra'], boxers: ['Črna', 'Siva', 'Modra', 'Zelena', 'Rdeča'] },
+                'P-2': { shirts: ['Črna', 'Črna', 'Bela', 'Bela', 'Siva'], boxers: ['Črna', 'Siva', 'Modra', 'Zelena', 'Rdeča'] },
+                'P-3': { shirts: ['Črna', 'Rjava', 'Bež', 'Zelena', 'Bela'], boxers: ['Črna', 'Siva', 'Modra', 'Zelena', 'Rdeča'] },
+                'P-4': { shirts: ['Črna', 'Črna', 'Črna', 'Črna', 'Črna'], boxers: ['Črna', 'Črna', 'Črna', 'Črna', 'Črna'] },
+            };
+            // 4+10 bundles (verified from WC descriptions):
+            const bundleVariants_4_10 = {
+                'P-1': { shirts: ['Črna', 'Črna', 'Bela', 'Bela'], boxers: ['Črna', 'Črna', 'Siva', 'Siva', 'Modra', 'Modra', 'Zelena', 'Zelena', 'Rdeča', 'Rdeča'] },
+                'P-2': { shirts: ['Črna', 'Črna', 'Temno modra', 'Temno modra'], boxers: ['Črna', 'Črna', 'Siva', 'Siva', 'Modra', 'Modra', 'Zelena', 'Zelena', 'Rdeča', 'Rdeča'] },
+                'P-3': { shirts: ['Črna', 'Črna', 'Siva', 'Siva'], boxers: ['Črna', 'Črna', 'Siva', 'Siva', 'Modra', 'Modra', 'Zelena', 'Zelena', 'Rdeča', 'Rdeča'] },
+                'P-4': { shirts: ['Črna', 'Siva', 'Temno modra', 'Bela'], boxers: ['Črna', 'Črna', 'Siva', 'Siva', 'Modra', 'Modra', 'Zelena', 'Zelena', 'Rdeča', 'Rdeča'] },
+            };
+            
+            // Detect variant from code (e.g., SHIRTS-BOX-P-3-XL or SH-BOX-5-5-P-3-4)
+            const variantMatch = code.match(/P-(\d)/);
+            const variant = variantMatch ? `P-${variantMatch[1]}` : null;
+            
+            // Detect bundle size from code
+            const isLargeBundle = code.includes('SH-BOX-4-10') || code.includes('SHIRTS-BOX-4-10');
+            const is5_5Bundle = code.includes('SH-BOX-5-5') || code.includes('SHIRTS-BOX-5-5');
+            
+            let colors;
+            if (isLargeBundle) {
+                numShirts = 4; numBoxers = 10;
+                colors = bundleVariants_4_10[variant] || bundleVariants_4_10['P-4'];
+            } else if (is5_5Bundle) {
+                numShirts = 5; numBoxers = 5;
+                colors = bundleVariants_5_5[variant] || bundleVariants_5_5['P-2'];
+            } else {
+                // 2+5 default
+                colors = bundleVariants_2_5[variant] || { shirts: ['Črna', 'Bela'], boxers: ['Črna', 'Siva', 'Modra', 'Zelena', 'Rdeča'] };
+            }
+            
+            // Fallback to code pattern if name didn't provide counts
+            if (!nameCountMatch && !nameBoxerMatch && !isLargeBundle && !is5_5Bundle) {
+                const countMatch = code.match(/(?:SH-BOX|SHIRTS-BOX)-(\d+)-(\d+)/i);
+                if (countMatch) {
+                    numShirts = parseInt(countMatch[1]);
+                    numBoxers = parseInt(countMatch[2]);
+                }
+            }
+            
+            const shirtColors = colors.shirts;
+            const boxerColors = colors.boxers;
+            
+            for (let n = 0; n < numShirts; n++) {
+                items.push({ type: 'Majica', color: shirtColors[n % shirtColors.length], size: sSize });
+            }
+            for (let n = 0; n < numBoxers; n++) {
+                items.push({ type: 'Boksarice', color: boxerColors[n % boxerColors.length], size: bSize });
             }
         }
         if (items.length > 0) return items;
@@ -3660,6 +4074,131 @@ function getProductTypeFromCode(code, name) {
     }
     return '';
 }
+// WooCommerce store credentials
+const wcStores = {
+    hr: { url: 'https://noriks.com/hr', ck: 'ck_d73881b20fd65125fb071414b8d54af7681549e3', cs: 'cs_e024298df41e4352d90e006d2ec42a5b341c1ce5' },
+    cz: { url: 'https://noriks.com/cz', ck: 'ck_396d624acec5f7a46dfcfa7d2a74b95c82b38962', cs: 'cs_2a69c7ad4a4d118a2b8abdf44abdd058c9be9115' },
+    pl: { url: 'https://noriks.com/pl', ck: 'ck_8fd83582ada887d0e586a04bf870d43634ca8f2c', cs: 'cs_f1bf98e46a3ae0623c5f2f9fcf7c2478240c5115' },
+    sk: { url: 'https://noriks.com/sk', ck: 'ck_1abaeb006bb9039da0ad40f00ab674067ff1d978', cs: 'cs_32b33bc2716b07a738ff18eb377a767ef60edfe7' },
+    hu: { url: 'https://noriks.com/hu', ck: 'ck_e591c2a0bf8c7a59ec5893e03adde3c760fbdaae', cs: 'cs_d84113ee7a446322d191be0725c0c92883c984c3' },
+    gr: { url: 'https://noriks.com/gr', ck: 'ck_2595568b83966151e08031e42388dd1c34307107', cs: 'cs_dbd091b4fc11091638f8ec4c838483be32cfb15b' },
+    it: { url: 'https://noriks.com/it', ck: 'ck_84a1e1425710ff9eeed69b100ed9ac445efc39e2', cs: 'cs_81d25dcb0371773387da4d30482afc7ce83d1b3e' },
+};
+
+// Verify bundles endpoint - analyze WC product images vs our definitions
+app.get('/api/packing/verify-bundles', async (req, res) => {
+    try {
+        const skus = Object.keys(bundleContents);
+        const uniqueBaseSKUs = [...new Set(skus.map(s => s.replace(/-((?:\d*X*)?[SMLX]{1,3}L?)$/, '')))];
+        
+        // Fetch all products from HR store first (most complete)
+        const hrCreds = wcStores.hr;
+        const wcProductMap = {};
+        
+        // Batch: fetch 100 products at a time by searching
+        console.log(`[Verify] Fetching ${uniqueBaseSKUs.length} unique SKUs from WC...`);
+        const batchPromises = uniqueBaseSKUs.map(async (baseSku) => {
+            try {
+                const wcRes = await fetch(`${hrCreds.url}/wp-json/wc/v3/products?sku=${baseSku}&per_page=1`, {
+                    headers: { 'Authorization': 'Basic ' + Buffer.from(`${hrCreds.ck}:${hrCreds.cs}`).toString('base64') }
+                });
+                const data = await wcRes.json();
+                if (data.length > 0) wcProductMap[baseSku] = { product: data[0], store: 'hr' };
+            } catch (e) {}
+        });
+        
+        await Promise.all(batchPromises);
+        console.log(`[Verify] Found ${Object.keys(wcProductMap).length} products in WC`);
+        
+        const results = skus.map(sku => {
+            const currentItems = bundleContents[sku]('TEST');
+            const currentSummary = {};
+            currentItems.forEach(item => {
+                const key = `${item.color} ${item.type}`;
+                currentSummary[key] = (currentSummary[key] || 0) + 1;
+            });
+            
+            const baseSku = sku.replace(/-((?:\d*X*)?[SMLX]{1,3}L?)$/, '');
+            const wc = wcProductMap[baseSku];
+            const wcProduct = wc?.product;
+            
+            return {
+                sku,
+                name: wcProduct?.name || sku,
+                store: wc?.store || null,
+                imageUrl: wcProduct?.images?.[0]?.src || null,
+                description: (wcProduct?.short_description || '').replace(/<[^>]+>/g, ''),
+                meta: {
+                    numShirts: wcProduct?.meta_data?.find(m => m.key === 'number_of_shirts_in_this_product')?.value || null,
+                },
+                currentDefinition: currentSummary,
+                totalItems: currentItems.length,
+                type: currentItems[0]?.type || 'Unknown',
+            };
+        });
+        
+        res.json({ bundles: results, count: results.length });
+    } catch (e) {
+        console.error('[Verify] Error:', e);
+        res.status(500).json({ error: e.message });
+    }
+});
+
+// Analyze a single bundle image with GPT-4o vision
+app.post('/api/packing/analyze-bundle', async (req, res) => {
+    const { imageUrl, productName, expectedCount } = req.body;
+    if (!imageUrl) return res.status(400).json({ error: 'imageUrl required' });
+    
+    try {
+        const OPENAI_KEY = process.env.OPENAI_API_KEY;
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${OPENAI_KEY}` },
+            body: JSON.stringify({
+                model: 'gpt-4o',
+                messages: [{
+                    role: 'user',
+                    content: [
+                        { type: 'text', text: `This is a product image for "${productName}" which should contain ${expectedCount} items. Count EVERY item visible and list each color with exact count. Available colors are: Črna (black), Bela (white), Siva (grey), Tamnoplava (navy blue), Zelena (olive green), Smeđa (brown/camel), Bež (cream/beige), Modra (blue), Rdeča (red). Respond ONLY with JSON: {"items": [{"color": "Črna", "type": "Majica", "count": 2}, ...], "total": 9, "confidence": "high/medium/low"}` },
+                        { type: 'image_url', image_url: { url: imageUrl } }
+                    ]
+                }],
+                max_tokens: 500
+            })
+        });
+        
+        const data = await response.json();
+        const content = data.choices?.[0]?.message?.content || '';
+        // Extract JSON from response
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+            res.json(JSON.parse(jsonMatch[0]));
+        } else {
+            res.json({ raw: content, error: 'Could not parse JSON' });
+        }
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+// Save verified bundle definition
+app.post('/api/packing/save-bundle', async (req, res) => {
+    // This would write to a JSON file that overrides hardcoded definitions
+    const { sku, items } = req.body;
+    if (!sku || !items) return res.status(400).json({ error: 'sku and items required' });
+    
+    try {
+        const overridesPath = path.join(__dirname, 'data', 'bundle-overrides.json');
+        let overrides = {};
+        try { overrides = JSON.parse(fs.readFileSync(overridesPath, 'utf8')); } catch(e) {}
+        overrides[sku] = items;
+        fs.writeFileSync(overridesPath, JSON.stringify(overrides, null, 2));
+        res.json({ ok: true, sku });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
 // ============ END PACKING API ============
 
 // Serve index.html for root
