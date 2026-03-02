@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bundle Checker | NORIKS</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+        .header { background: #1a1a1a; color: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { font-size: 18px; }
+        .header h1 span { color: #10b981; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .stats { display: flex; gap: 20px; margin-bottom: 20px; font-size: 14px; color: #666; }
+        .stats .ok { color: #10b981; font-weight: 700; }
+        .stats .warn { color: #f59e0b; font-weight: 700; }
+        .stats .err { color: #ef4444; font-weight: 700; }
+        
+        .bundle-card {
+            background: #fff;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: grid;
+            grid-template-columns: 200px 1fr 1fr 1fr auto;
+            gap: 16px;
+            align-items: start;
+        }
+        .bundle-card.match { border-left: 4px solid #10b981; }
+        .bundle-card.mismatch { border-left: 4px solid #ef4444; }
+        .bundle-card.pending { border-left: 4px solid #f59e0b; }
+        .bundle-card.no-image { border-left: 4px solid #6b7280; }
+        
+        .bundle-image { width: 200px; height: 150px; object-fit: contain; border-radius: 6px; background: #f9f9f9; }
+        .bundle-info h3 { font-size: 14px; margin-bottom: 4px; }
+        .bundle-info .sku { font-size: 11px; color: #888; font-family: monospace; }
+        .bundle-info .meta { font-size: 11px; color: #666; margin-top: 4px; }
+        
+        .def-column h4 { font-size: 12px; color: #888; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .def-item { font-size: 13px; padding: 2px 0; display: flex; align-items: center; gap: 6px; }
+        .color-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; border: 1px solid #ddd; }
+        
+        .actions { display: flex; flex-direction: column; gap: 6px; }
+        .btn { padding: 8px 14px; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; font-weight: 600; }
+        .btn-analyze { background: #3b82f6; color: #fff; }
+        .btn-analyze:hover { background: #2563eb; }
+        .btn-confirm { background: #10b981; color: #fff; }
+        .btn-confirm:hover { background: #059669; }
+        .btn-confirm:disabled { background: #ccc; cursor: not-allowed; }
+        .btn-all { background: #8b5cf6; color: #fff; padding: 10px 20px; font-size: 14px; }
+        .btn-all:hover { background: #7c3aed; }
+        
+        .status-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; display: inline-block; margin-top: 4px; }
+        .status-badge.ok { background: #d1fae5; color: #065f46; }
+        .status-badge.warn { background: #fef3c7; color: #92400e; }
+        .status-badge.err { background: #fee2e2; color: #991b1b; }
+        .status-badge.pending { background: #e5e7eb; color: #374151; }
+        
+        .loading-spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #ddd; border-top-color: #3b82f6; border-radius: 50%; animation: spin 0.6s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .ai-result { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 8px; margin-top: 6px; font-size: 12px; }
+        .ai-result.mismatch { background: #fef2f2; border-color: #fecaca; }
+        
+        .confidence { font-size: 10px; color: #888; }
+        
+        @media (max-width: 1000px) {
+            .bundle-card { grid-template-columns: 1fr; }
+            .bundle-image { width: 100%; height: auto; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔍 <span>Bundle Checker</span> | NORIKS</h1>
+        <div>
+            <button class="btn btn-all" onclick="analyzeAll()">🤖 Analiziraj vse z AI</button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="stats" id="stats">Nalagam...</div>
+        <div id="bundles"></div>
+    </div>
+
+<script>
+    const colorHex = {
+        'Črna': '#1a1a1a', 'Modra': '#3b82f6', 'Bela': '#ffffff', 'Siva': '#6b7280',
+        'Rdeča': '#ef4444', 'Zelena': '#22c55e', 'Smeđa': '#92400e', 'Bež': '#d4c5a9',
+        'Tamnoplava': '#1e3a8a', 'Rjava': '#92400e',
+    };
+    
+    let bundleData = [];
+    let aiResults = {};
+    
+    async function loadBundles() {
+        const res = await fetch('/api/packing/verify-bundles');
+        const data = await res.json();
+        bundleData = data.bundles;
+        render();
+    }
+    
+    function defToList(def) {
+        return Object.entries(def).map(([key, count]) => ({ label: key, count }))
+            .sort((a, b) => a.label.localeCompare(b.label));
+    }
+    
+    function itemsToSummary(items) {
+        const summary = {};
+        items.forEach(i => {
+            const key = `${i.color} ${i.type}`;
+            summary[key] = (summary[key] || 0) + (i.count || 1);
+        });
+        return summary;
+    }
+    
+    function compareDefs(current, ai) {
+        const allKeys = new Set([...Object.keys(current), ...Object.keys(ai)]);
+        let match = true;
+        for (const key of allKeys) {
+            if ((current[key] || 0) !== (ai[key] || 0)) { match = false; break; }
+        }
+        return match;
+    }
+    
+    function render() {
+        let okCount = 0, warnCount = 0, errCount = 0, pendingCount = 0;
+        
+        const html = bundleData.map((b, idx) => {
+            const ai = aiResults[b.sku];
+            let status = 'pending';
+            let statusText = 'Čaka na analizo';
+            
+            if (ai) {
+                if (ai.error) {
+                    status = 'warn'; statusText = 'Napaka AI'; warnCount++;
+                } else {
+                    const aiSummary = itemsToSummary(ai.items || []);
+                    const match = compareDefs(b.currentDefinition, aiSummary);
+                    if (match) { status = 'ok'; statusText = '✅ Ujema se'; okCount++; }
+                    else { status = 'err'; statusText = '❌ Razlika!'; errCount++; }
+                }
+            } else if (!b.imageUrl) {
+                status = 'no-image'; statusText = 'Ni slike'; warnCount++;
+            } else {
+                pendingCount++;
+            }
+            
+            const currentList = defToList(b.currentDefinition);
+            const aiList = ai && !ai.error ? defToList(itemsToSummary(ai.items || [])) : null;
+            
+            return `
+                <div class="bundle-card ${status}" id="bundle-${idx}">
+                    ${b.imageUrl ? `<img src="${b.imageUrl}" class="bundle-image" loading="lazy">` : '<div class="bundle-image" style="display:flex;align-items:center;justify-content:center;color:#aaa;">Ni slike</div>'}
+                    
+                    <div class="bundle-info">
+                        <h3>${b.name}</h3>
+                        <div class="sku">${b.sku}</div>
+                        <div class="meta">
+                            ${b.store ? `Trgovina: ${b.store.toUpperCase()}` : ''}
+                            ${b.meta.numShirts ? `| Majic: ${b.meta.numShirts}` : ''}
+                            | Skupaj: ${b.totalItems} kos
+                        </div>
+                        <span class="status-badge ${status}">${statusText}</span>
+                        ${ai && ai.confidence ? `<span class="confidence">Zaupanje: ${ai.confidence}</span>` : ''}
+                    </div>
+                    
+                    <div class="def-column">
+                        <h4>📋 Trenutna definicija</h4>
+                        ${currentList.map(i => `
+                            <div class="def-item">
+                                <span class="color-dot" style="background:${colorHex[i.label.split(' ')[0]] || '#ccc'}"></span>
+                                ${i.count}x ${i.label}
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="def-column">
+                        <h4>🤖 AI analiza</h4>
+                        ${aiList ? aiList.map(i => `
+                            <div class="def-item">
+                                <span class="color-dot" style="background:${colorHex[i.label.split(' ')[0]] || '#ccc'}"></span>
+                                ${i.count}x ${i.label}
+                            </div>
+                        `).join('') : '<div style="color:#aaa;font-size:12px;">Klikni "Analiziraj"</div>'}
+                        ${ai && !ai.error && status === 'err' ? `
+                            <div class="ai-result mismatch">
+                                ⚠️ AI vidi drugačno sestavo!
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="actions">
+                        <button class="btn btn-analyze" onclick="analyzeOne(${idx})" ${!b.imageUrl ? 'disabled' : ''}>
+                            🔍 Analiziraj
+                        </button>
+                        ${ai && !ai.error && status === 'err' ? `
+                            <button class="btn btn-confirm" onclick="acceptAI(${idx})">
+                                ✅ Sprejmi AI
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        document.getElementById('bundles').innerHTML = html;
+        document.getElementById('stats').innerHTML = `
+            <span>Skupaj: <strong>${bundleData.length}</strong> paketov</span>
+            <span class="ok">✅ Ujema se: ${okCount}</span>
+            <span class="err">❌ Razlika: ${errCount}</span>
+            <span class="warn">⚠️ Opozorilo: ${warnCount}</span>
+            <span>⏳ Čaka: ${pendingCount}</span>
+        `;
+    }
+    
+    async function analyzeOne(idx) {
+        const b = bundleData[idx];
+        if (!b.imageUrl) return;
+        
+        // Show loading
+        const card = document.getElementById(`bundle-${idx}`);
+        const btn = card.querySelector('.btn-analyze');
+        btn.innerHTML = '<span class="loading-spinner"></span> Analiziram...';
+        btn.disabled = true;
+        
+        try {
+            const res = await fetch('/api/packing/analyze-bundle', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    imageUrl: b.imageUrl,
+                    productName: b.name,
+                    expectedCount: b.totalItems
+                })
+            });
+            const data = await res.json();
+            aiResults[b.sku] = data;
+        } catch (e) {
+            aiResults[b.sku] = { error: e.message };
+        }
+        
+        render();
+    }
+    
+    async function analyzeAll() {
+        for (let i = 0; i < bundleData.length; i++) {
+            if (!bundleData[i].imageUrl) continue;
+            if (aiResults[bundleData[i].sku]) continue; // skip already analyzed
+            await analyzeOne(i);
+            // Small delay to avoid rate limiting
+            await new Promise(r => setTimeout(r, 500));
+        }
+    }
+    
+    async function acceptAI(idx) {
+        const b = bundleData[idx];
+        const ai = aiResults[b.sku];
+        if (!ai || ai.error) return;
+        
+        try {
+            const res = await fetch('/api/packing/save-bundle', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sku: b.sku, items: ai.items })
+            });
+            const data = await res.json();
+            if (data.ok) {
+                alert(`✅ ${b.sku} shranjen! Potreben restart serverja za uveljavitev.`);
+            }
+        } catch (e) {
+            alert('Napaka: ' + e.message);
+        }
+    }
+    
+    loadBundles();
+</script>
+</body>
+</html>
