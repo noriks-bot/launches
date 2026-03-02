@@ -2181,11 +2181,10 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             const end = formatAssTime(t.end);
             let styleName = (resolvedStyle !== style) ? `S_${resolvedStyle}` : 'Default';
             
-            let pos = '\\an5\\pos(540,960)';
-            if (t.position === 'center-top') pos = '\\an5\\pos(540,880)';
-            else if (t.position === 'center-bottom') pos = '\\an5\\pos(540,1000)';
-            else if (t.position === 'top') pos = '\\an8';
-            else if (t.position === 'bottom') pos = '\\an2';
+            // Use original y% position from OCR for accurate placement
+            const pixelX = 540;
+            const pixelY = (t.y !== undefined) ? Math.round((t.y / 100) * 1920) : 960;
+            let pos = `\\an5\\pos(${pixelX},${pixelY})`;
             
             ass += `Dialogue: 0,${start},${end},${styleName},,0,0,0,,{${pos}\\fad(200,200)}${t.text}\n`;
         });
