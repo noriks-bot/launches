@@ -634,77 +634,123 @@ Write ONLY the title in ${lang}, nothing else.`;
 
 // Generate review for Social Proof Generator (frontend calls this)
 app.post('/api/generate-review', async (req, res) => {
-    const { country, product, praise, stars, style, isGift } = req.body;
+    const { country, product, stars, style, isGift } = req.body;
     
     const lang = languages[country.toLowerCase()] || 'English';
     
-    const productMap = {
-        boxers: { en: 'boxer shorts', hr: 'boksarice', cz: 'boxerky', pl: 'bokserki', gr: 'μποξεράκια', it: 'boxer', hu: 'boxer', sk: 'boxerky' },
-        tshirt: { en: 't-shirt', hr: 'majica', cz: 'tričko', pl: 'koszulka', gr: 'μπλούζα', it: 'maglietta', hu: 'póló', sk: 'tričko' },
-        set: { en: 'underwear set', hr: 'komplet', cz: 'set', pl: 'zestaw', gr: 'σετ', it: 'set', hu: 'szett', sk: 'set' }
+    const productNames = {
+        boxers: 'boxer shorts / underwear',
+        tshirt: 't-shirt',
+        set: 'underwear set (boxers + t-shirt)'
     };
-    
-    const praiseMap = {
-        quality: 'amazing product quality, soft comfortable material, perfect fit that stays in place',
-        delivery: 'super fast delivery, excellent packaging, arrived quickly',
-        support: 'excellent customer support, quick helpful responses, great communication',
-        value: 'great value for money, affordable yet premium quality, worth every penny',
-        comfort: 'incredibly comfortable, feels like wearing nothing, perfect all-day comfort',
-        durability: 'very durable, keeps shape and color after many washes, long-lasting quality',
-        gift: 'bought as gift for partner/husband, they absolutely love it, great gift idea'
-    };
-    
-    const productName = productMap[product]?.en || 'underwear';
-    const praiseFocus = praiseMap[praise] || praiseMap.quality;
+    const productName = productNames[product] || 'underwear';
     
     const isFacebook = style === 'facebook';
     
-    // Gender context for the review
+    // Randomly pick focus, tone, length for maximum variety
+    const focuses = [
+        'product quality and material softness',
+        'comfort — feels amazing all day',
+        'perfect fit that stays in place',
+        'durability — survives many washes perfectly',
+        'fast shipping and nice packaging',
+        'great value for the price',
+        'bought multiple pairs because so good',
+        'compared to other brands these are far superior',
+        'the material breathes well, no sweating',
+        'perfect for everyday wear',
+        'surprisingly premium for the price',
+        'ordered again after first pair impressed me',
+        'wife/girlfriend noticed and complimented',
+        'finally found underwear that doesn\'t ride up',
+        'the elastic waistband is comfortable, not tight',
+        'colors stay vibrant after washing',
+        'feels like luxury but affordable',
+        'replaced all my old underwear with these',
+        'great for sports and active lifestyle',
+        'the packaging was nice, felt premium'
+    ];
+    const tones = [
+        'enthusiastic and excited',
+        'calm and matter-of-fact satisfied',
+        'casually impressed, understated',
+        'genuinely surprised by the quality',
+        'recommending to friends vibe',
+        'short and punchy',
+        'detailed and thoughtful',
+        'funny/witty but genuine'
+    ];
+    const lengths = ['very short (1-2 sentences)', 'medium (2-3 sentences)', 'slightly longer (3-4 sentences)'];
+    
+    const focus = focuses[Math.floor(Math.random() * focuses.length)];
+    const tone = tones[Math.floor(Math.random() * tones.length)];
+    const length = lengths[Math.floor(Math.random() * lengths.length)];
+    const mentionBrand = Math.random() > 0.3; // 70% chance to mention NORIKS
+    const useExclamation = Math.random() > 0.5;
+    
+    // Gender context
     const genderContext = isGift 
         ? 'The reviewer is a WOMAN who bought this as a gift for her boyfriend/husband. She talks about how HE loves it.'
-        : 'The reviewer is a MAN who bought this for himself. He talks about his own experience wearing it.';
+        : 'The reviewer is a MAN who bought this for himself.';
+    
+    const brandInstruction = mentionBrand 
+        ? 'Mention NORIKS brand name naturally somewhere in the text.'
+        : 'Do NOT mention any brand name — just talk about the product.';
     
     const prompt = isFacebook 
-        ? `Write an authentic Facebook comment in ${lang} language praising NORIKS brand ${productName}.
+        ? `Write a unique, authentic Facebook comment in ${lang} about ${productName}.
 
 ${genderContext}
 
-The comment should emphasize: ${praiseFocus}
+Topic/angle: ${focus}
+Tone: ${tone}
+Length: ${length}
 
-Requirements:
-- Write like a REAL Facebook comment, casual and conversational
-- 2-3 sentences maximum (short comment style)
-- Can compare to other brands (without naming them) like "other boxers always..."
-- NO hashtags, NO emojis, NO formal language
-- Mention NORIKS brand name naturally
-- Sound like a native ${lang} speaker — use natural colloquial phrasing, idioms, and slang that real people use on social media
+Rules:
+- Write like a REAL person commenting on Facebook — casual, natural, imperfect
+- ${brandInstruction}
+- ${useExclamation ? 'Can use exclamation marks' : 'Keep it calm, no exclamation marks'}
+- NO hashtags, NO emojis, NO marketing language
+- Sound EXACTLY like a native ${lang} speaker — use colloquial phrases, slang, natural sentence structures that real people from that country use online
 - Use correct grammatical gender for the reviewer
-- CRITICAL: The ENTIRE text MUST be in ${lang}. Do NOT use English words (except "NORIKS" brand name). Every single word must be ${lang}.
+- CRITICAL: EVERY word must be in ${lang} (except brand name "NORIKS" if used)
+- Make this UNIQUE — do not write a generic review. Give it personality.
 
-Return ONLY the comment text in ${lang}, no quotes.`
-        : `Write an authentic short customer review in ${lang} language for NORIKS brand ${productName}.
+Return ONLY the comment text, nothing else.`
+        : `Write a unique, authentic customer review in ${lang} for ${productName}.
 
 ${genderContext}
 
-The review should emphasize: ${praiseFocus}
+Topic/angle: ${focus}
+Tone: ${tone}
+Length: ${length}
 
-Requirements:
-- Write like a REAL customer, casual and genuine
-- 3-4 sentences maximum
-- NO marketing speak, NO formal language
-- Mention NORIKS brand naturally
-- Sound like a native ${lang} speaker — use natural colloquial phrasing and expressions that real people use
+Rules:
+- Write like a REAL person, not a marketer
+- ${brandInstruction}
+- ${useExclamation ? 'Can use exclamation marks' : 'Keep it calm, minimal exclamation marks'}
+- NO marketing speak, NO generic phrases like "highly recommend" or "excellent product"
+- Sound EXACTLY like a native ${lang} speaker — use natural everyday language, colloquial expressions
 - Use correct grammatical gender for the reviewer
-- CRITICAL: The ENTIRE text MUST be in ${lang}. Do NOT use English words (except "NORIKS" brand name). Every single word must be ${lang}.
-- ${stars === 4 ? 'Slightly less enthusiastic but still positive' : 'Very satisfied customer'}
+- CRITICAL: EVERY word must be in ${lang} (except brand name "NORIKS" if used)
+- ${stars === 4 ? 'Good but not perfect — maybe one tiny nitpick mixed with overall satisfaction' : 'Very happy customer'}
+- Make this UNIQUE — give it real personality, specific details, a human touch
 
-Return ONLY the review text, no quotes, no translation, just the ${lang} text.`;
+Return ONLY the review text, nothing else.`;
 
-    const titlePrompt = `Write a short catchy review title (3-6 words) in ${lang} language for a ${productName} review.
-
-Examples style: "Best purchase ever!", "Finally found the one", "Super comfortable!"
-
-Write ONLY the title in ${lang}, no quotes. The title MUST be entirely in ${lang}, no English words.`;
+    const titleStyles = [
+        'excited short phrase (2-4 words)',
+        'calm satisfied statement (3-5 words)',
+        'question style like "Why didn\'t I find these sooner?"',
+        'superlative like "Best X ever"',
+        'personal like "My new favorite"',
+        'comparison like "Better than expected"',
+        'witty/clever short phrase'
+    ];
+    const titleStyle = titleStyles[Math.floor(Math.random() * titleStyles.length)];
+    
+    const titlePrompt = `Write a review title in ${lang} for ${productName}. Style: ${titleStyle}. 
+MUST be in ${lang}, 2-6 words, no quotes. Return ONLY the title.`;
 
     try {
         // For Facebook style, skip title generation
@@ -719,7 +765,7 @@ Write ONLY the title in ${lang}, no quotes. The title MUST be entirely in ${lang
                     model: 'gpt-4o-mini',
                     messages: [{ role: 'user', content: prompt }],
                     max_tokens: 300,
-                    temperature: 0.85
+                    temperature: 1.0
                 })
             })
         ];
@@ -737,7 +783,7 @@ Write ONLY the title in ${lang}, no quotes. The title MUST be entirely in ${lang
                         model: 'gpt-4o-mini',
                         messages: [{ role: 'user', content: titlePrompt }],
                         max_tokens: 50,
-                        temperature: 0.85
+                        temperature: 1.0
                     })
                 })
             );
