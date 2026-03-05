@@ -2225,10 +2225,11 @@
                     const texts = [];
                     let lastTextEntry = null;
                     const creativeUppercase = creative.uppercase || false;
-                    const MIN_DUR = 1.0;
+                    const MIN_DUR = 2.0;
                     creative.segments.forEach(seg => {
                         const segTexts = seg.texts || [];
-                        if (segTexts.length === 0) {
+                        const hasContent = segTexts.some(t => t.text && t.text.trim());
+                        if (segTexts.length === 0 || !hasContent) {
                             if (lastTextEntry) lastTextEntry.end = seg.end;
                             return;
                         }
@@ -2253,13 +2254,19 @@
                                 lastTextEntry = entry;
                             });
                         } else {
-                            // Sequential
+                            // Sequential: each text fills its portion, min MIN_DUR
                             const duration = seg.end - seg.start;
-                            const perText = Math.max(duration / segTexts.length, MIN_DUR);
+                            const perText = duration / segTexts.length;
                             segTexts.forEach((t, i) => {
+                                let tStart = seg.start + (i * perText);
+                                let tEnd = seg.start + ((i + 1) * perText);
+                                if (tEnd - tStart < MIN_DUR) {
+                                    tEnd = Math.min(tStart + MIN_DUR, seg.end);
+                                }
+                                if (i === segTexts.length - 1) tEnd = seg.end;
                                 const entry = {
-                                    start: seg.start + (i * perText),
-                                    end: seg.start + ((i + 1) * perText),
+                                    start: tStart,
+                                    end: tEnd,
                                     text: creativeUppercase ? t.text.toUpperCase() : t.text,
                                     role: t.role || 'solution_benefit',
                                     style: segStyle
@@ -2382,7 +2389,7 @@
             }
             
             let added = 0;
-            const MIN_DUR = 1.0;
+            const MIN_DUR = 2.0;
             for (const creative of readyCreatives) {
                 try {
                     const texts = [];
@@ -2390,7 +2397,8 @@
                     const creativeUppercase = creative.uppercase || false;
                     creative.segments.forEach(seg => {
                         const segTexts = seg.texts || [];
-                        if (segTexts.length === 0) {
+                        const hasContent = segTexts.some(t => t.text && t.text.trim());
+                        if (segTexts.length === 0 || !hasContent) {
                             if (lastTextEntry) lastTextEntry.end = seg.end;
                             return;
                         }
@@ -2411,11 +2419,15 @@
                                 lastTextEntry = entry;
                             });
                         } else {
-                            // Sequential
+                            // Sequential: each text fills its portion, min MIN_DUR
                             const duration = seg.end - seg.start;
-                            const perText = Math.max(duration / segTexts.length, MIN_DUR);
+                            const perText = duration / segTexts.length;
                             segTexts.forEach((t, i) => {
-                                const entry = { start: seg.start + (i * perText), end: seg.start + ((i + 1) * perText), text: creativeUppercase ? t.text.toUpperCase() : t.text, role: t.role || 'solution_benefit' };
+                                let tStart = seg.start + (i * perText);
+                                let tEnd = seg.start + ((i + 1) * perText);
+                                if (tEnd - tStart < MIN_DUR) tEnd = Math.min(tStart + MIN_DUR, seg.end);
+                                if (i === segTexts.length - 1) tEnd = seg.end;
+                                const entry = { start: tStart, end: tEnd, text: creativeUppercase ? t.text.toUpperCase() : t.text, role: t.role || 'solution_benefit' };
                                 texts.push(entry);
                                 lastTextEntry = entry;
                             });
@@ -3347,7 +3359,7 @@
         // Empty segments: extend previous text to cover that time
         // Merge consecutive segments with same text into one
         // Minimum text duration: 1 second
-        const MIN_TEXT_DURATION = 1.0;
+        const MIN_TEXT_DURATION = 2.0;
         
         function flattenTexts() {
             const result = [];
@@ -3361,8 +3373,9 @@
                 const segTexts = seg.texts || [];
                 const segStyle = seg.style; // per-segment style from dropdown
                 
-                // If segment is empty, extend the last text to cover this segment
-                if (segTexts.length === 0) {
+                // If segment has no texts or all texts are empty, extend the last text to cover this segment
+                const hasContent = segTexts.some(t => t.text && t.text.trim());
+                if (segTexts.length === 0 || !hasContent) {
                     if (lastTextEntry) {
                         lastTextEntry.end = seg.end;
                     }
@@ -3389,14 +3402,24 @@
                         lastTextEntry = entry;
                     });
                 } else {
-                    // Sequential: split segment time equally among texts
+                    // Sequential: each text fills its segment portion, minimum MIN_TEXT_DURATION
                     const duration = seg.end - seg.start;
-                    const perText = Math.max(duration / segTexts.length, MIN_TEXT_DURATION);
+                    const perText = duration / segTexts.length;
                     
                     segTexts.forEach((t, i) => {
+                        let tStart = seg.start + (i * perText);
+                        let tEnd = seg.start + ((i + 1) * perText);
+                        // Enforce minimum duration — extend end but cap at segment end
+                        if (tEnd - tStart < MIN_TEXT_DURATION) {
+                            tEnd = Math.min(tStart + MIN_TEXT_DURATION, seg.end);
+                        }
+                        // If last text, always extend to segment end
+                        if (i === segTexts.length - 1) {
+                            tEnd = seg.end;
+                        }
                         const entry = {
-                            start: seg.start + (i * perText),
-                            end: seg.start + ((i + 1) * perText),
+                            start: tStart,
+                            end: tEnd,
                             text: useUppercase ? t.text.toUpperCase() : t.text,
                             role: t.role || 'solution_benefit',
                             style: t.style || segStyle

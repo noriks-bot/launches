@@ -4965,5 +4965,288 @@
     "currentLang": "HR",
     "outputs": {},
     "created": "2026-02-27T09:04:04.847Z"
+  },
+  {
+    "id": "gen-1772483009771",
+    "name": "ID112_02-03-26_BOXERS_NEW_DD",
+    "namingParts": {
+      "id": "ID112",
+      "date": "02-03-26",
+      "product": "BOXERS",
+      "type": "NEW",
+      "author": "DD"
+    },
+    "videoClean": "video-1772480938072.mp4",
+    "texts": [
+      {
+        "start": 0,
+        "end": 2.5,
+        "x": 35,
+        "y": 50,
+        "text": "Noriks Uvodni paket",
+        "style": "white"
+      },
+      {
+        "start": 2.5,
+        "end": 4,
+        "x": 24,
+        "y": 51,
+        "text": "Odkrij Noriks. Izberi svoj uvodni paket.",
+        "style": "white"
+      },
+      {
+        "start": 4.5,
+        "end": 7,
+        "x": 25,
+        "y": 30,
+        "text": "2x majica / 2x boksarice / 1x majica, 1x boksarice",
+        "style": "white"
+      },
+      {
+        "start": 7.5,
+        "end": 10,
+        "x": 10,
+        "y": 60,
+        "text": "95% kupcev se vrača po še!",
+        "style": "white"
+      },
+      {
+        "start": 11.5,
+        "end": 12,
+        "x": 50,
+        "y": 55,
+        "text": "Popolno prileganje za vsakogar",
+        "style": "white"
+      },
+      {
+        "start": 12,
+        "end": 14,
+        "x": 25,
+        "y": 60,
+        "text": "Začni svojo Noriks izkušnjo!",
+        "style": "white"
+      },
+      {
+        "start": 14,
+        "end": 16.5,
+        "x": 50,
+        "y": 54,
+        "text": "Naroči zdaj",
+        "style": "white"
+      }
+    ],
+    "style": "white",
+    "fontSize": 105,
+    "hookStyle": null,
+    "ctaStyle": null,
+    "perTextStyles": true,
+    "uppercase": false,
+    "countries": [
+      "HR"
+    ],
+    "source": "localize-bulk",
+    "status": "done",
+    "completed": 1,
+    "currentLang": "",
+    "outputs": {
+      "HR": "/home/ec2-user/.openclaw/workspace2/launches/uploads/generated/gen-1772483009771/ID112_02-03-26_HR_BOXERS_NEW_DD.mp4"
+    },
+    "created": "2026-03-02T20:23:29.771Z",
+    "qualityChecks": {
+      "HR": {
+        "lang": "HR",
+        "langName": "Croatian",
+        "issues": [
+          {
+            "type": "translation",
+            "text": "Pronađi Noriks. Odaberi svoj početni paket.",
+            "verdict": "AWKWARD",
+            "suggestion": "Pronađi Noriks i odaberi svoj početni paket.",
+            "reason": "The original text sounds a bit disjointed. Combining the sentences with 'i' flows more naturally."
+          },
+          {
+            "type": "translation",
+            "text": "2x majica / 2x bokserice / 1x majica, 1x bokserice",
+            "verdict": "AWKWARD",
+            "suggestion": "2x majica, 2x bokserice ili 1x majica, 1x bokserice",
+            "reason": "Using 'ili' and consistent separators would create a clearer distinction between package options."
+          }
+        ],
+        "checks": [
+          {
+            "text": "Noriks početni paket",
+            "verdict": "GOOD",
+            "suggestion": "",
+            "reason": "The phrase is clear and sounds natural in a marketing context."
+          },
+          {
+            "text": "Pronađi Noriks. Odaberi svoj početni paket.",
+            "verdict": "AWKWARD",
+            "suggestion": "Pronađi Noriks i odaberi svoj početni paket.",
+            "reason": "The original text sounds a bit disjointed. Combining the sentences with 'i' flows more naturally."
+          },
+          {
+            "text": "2x majica / 2x bokserice / 1x majica, 1x bokserice",
+            "verdict": "AWKWARD",
+            "suggestion": "2x majica, 2x bokserice ili 1x majica, 1x bokserice",
+            "reason": "Using 'ili' and consistent separators would create a clearer distinction between package options."
+          }
+        ],
+        "passed": false
+      }
+    },
+    "completedAt": "2026-03-02T20:24:14.002Z"
+  },
+  {
+    "id": "gen-1772483575283",
+    "name": "ID112_02-03-26_BOXERS_NEW_DD",
+    "namingParts": {
+      "id": "ID112",
+      "date": "02-03-26",
+      "product": "BOXERS",
+      "type": "NEW",
+      "author": "DD"
+    },
+    "videoClean": "video-1772483378748.mp4",
+    "texts": [
+      {
+        "start": 0,
+        "end": 2.5,
+        "x": 10,
+        "y": 50,
+        "text": "Noriks Začetni paket",
+        "style": "white"
+      },
+      {
+        "start": 2.5,
+        "end": 4,
+        "x": 28,
+        "y": 46,
+        "text": "Spoznaj Noriks. Izberi svoj začetni paket.",
+        "style": "white"
+      },
+      {
+        "start": 4.5,
+        "end": 7,
+        "x": 25,
+        "y": 40,
+        "text": "2x majica/ 2x boksarice/ 1x majica, 1x boksarice",
+        "style": "white"
+      },
+      {
+        "start": 7.5,
+        "end": 10,
+        "x": 22,
+        "y": 40,
+        "text": "95% kupcev se vrača po več!",
+        "style": "white"
+      },
+      {
+        "start": 12,
+        "end": 14,
+        "x": 20,
+        "y": 50,
+        "text": "Tvoj prvi korak v svet Noriks!",
+        "style": "white"
+      },
+      {
+        "start": 14,
+        "end": 16.5,
+        "x": 47,
+        "y": 55,
+        "text": "Naroči tukaj",
+        "style": "white"
+      }
+    ],
+    "style": "white",
+    "fontSize": 105,
+    "hookStyle": null,
+    "ctaStyle": null,
+    "perTextStyles": true,
+    "uppercase": false,
+    "countries": [
+      "HR",
+      "GR"
+    ],
+    "source": "localize-bulk",
+    "status": "done",
+    "completed": 2,
+    "currentLang": "",
+    "outputs": {
+      "HR": "/home/ec2-user/.openclaw/workspace2/launches/uploads/generated/gen-1772483575283/ID112_02-03-26_HR_BOXERS_NEW_DD.mp4",
+      "GR": "/home/ec2-user/.openclaw/workspace2/launches/uploads/generated/gen-1772483575283/ID112_02-03-26_GR_BOXERS_NEW_DD.mp4"
+    },
+    "created": "2026-03-02T20:32:55.283Z",
+    "qualityChecks": {
+      "HR": {
+        "lang": "HR",
+        "langName": "Croatian",
+        "issues": [
+          {
+            "type": "translation",
+            "text": "Noriks Start paket",
+            "verdict": "AWKWARD",
+            "suggestion": "Noriks početni paket",
+            "reason": "Using 'Start' in English can sound out of place when a Croatian equivalent exists and would sound more natural."
+          }
+        ],
+        "checks": [
+          {
+            "text": "Noriks Start paket",
+            "verdict": "AWKWARD",
+            "suggestion": "Noriks početni paket",
+            "reason": "Using 'Start' in English can sound out of place when a Croatian equivalent exists and would sound more natural."
+          },
+          {
+            "text": "Upoznaj Noriks. Izaberi svoj paket.",
+            "verdict": "GOOD",
+            "suggestion": null,
+            "reason": "The text is clear, concise, and sounds natural in Croatian."
+          },
+          {
+            "text": "2x majica / 2x bokserice / 1x majica, 1x bokserice",
+            "verdict": "GOOD",
+            "suggestion": null,
+            "reason": "The format and wording are clear and appropriate for listing product combinations in Croatian."
+          }
+        ],
+        "passed": false
+      },
+      "GR": {
+        "lang": "GR",
+        "langName": "Greek",
+        "issues": [
+          {
+            "type": "translation",
+            "text": "Noriks Αρχικό πακέτο",
+            "verdict": "AWKWARD",
+            "suggestion": "Αρχικό πακέτο Noriks",
+            "reason": "The adjective usually precedes the brand name in Greek for better flow and clarity."
+          }
+        ],
+        "checks": [
+          {
+            "text": "Noriks Αρχικό πακέτο",
+            "verdict": "AWKWARD",
+            "suggestion": "Αρχικό πακέτο Noriks",
+            "reason": "The adjective usually precedes the brand name in Greek for better flow and clarity."
+          },
+          {
+            "text": "Γνώρισε το Noriks. Διάλεξε το πακέτο σου.",
+            "verdict": "GOOD",
+            "suggestion": "",
+            "reason": "The phrasing is natural and commonly used in marketing language."
+          },
+          {
+            "text": "2x μπλουζάκι / 2x μποξεράκια / 1x μπλουζάκι, 1x μποξεράκι",
+            "verdict": "GOOD",
+            "suggestion": "",
+            "reason": "The text is clear and directly communicates the quantities and items in a natural manner."
+          }
+        ],
+        "passed": false
+      }
+    },
+    "completedAt": "2026-03-02T20:33:56.600Z"
   }
 ]

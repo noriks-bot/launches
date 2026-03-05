@@ -677,8 +677,9 @@ Requirements:
 - Can compare to other brands (without naming them) like "other boxers always..."
 - NO hashtags, NO emojis, NO formal language
 - Mention NORIKS brand name naturally
-- Sound like native ${lang} speaker
+- Sound like a native ${lang} speaker — use natural colloquial phrasing, idioms, and slang that real people use on social media
 - Use correct grammatical gender for the reviewer
+- CRITICAL: The ENTIRE text MUST be in ${lang}. Do NOT use English words (except "NORIKS" brand name). Every single word must be ${lang}.
 
 Return ONLY the comment text in ${lang}, no quotes.`
         : `Write an authentic short customer review in ${lang} language for NORIKS brand ${productName}.
@@ -692,8 +693,9 @@ Requirements:
 - 3-4 sentences maximum
 - NO marketing speak, NO formal language
 - Mention NORIKS brand naturally
-- Sound like native ${lang} speaker
+- Sound like a native ${lang} speaker — use natural colloquial phrasing and expressions that real people use
 - Use correct grammatical gender for the reviewer
+- CRITICAL: The ENTIRE text MUST be in ${lang}. Do NOT use English words (except "NORIKS" brand name). Every single word must be ${lang}.
 - ${stars === 4 ? 'Slightly less enthusiastic but still positive' : 'Very satisfied customer'}
 
 Return ONLY the review text, no quotes, no translation, just the ${lang} text.`;
@@ -702,7 +704,7 @@ Return ONLY the review text, no quotes, no translation, just the ${lang} text.`;
 
 Examples style: "Best purchase ever!", "Finally found the one", "Super comfortable!"
 
-Write ONLY the title in ${lang}, no quotes.`;
+Write ONLY the title in ${lang}, no quotes. The title MUST be entirely in ${lang}, no English words.`;
 
     try {
         // For Facebook style, skip title generation

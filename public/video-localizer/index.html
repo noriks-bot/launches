@@ -196,6 +196,13 @@
             padding: 15px;
             margin-bottom: 15px;
         }
+        .segment-card.segment-empty {
+            border-left: 3px solid #f39c12;
+            opacity: 0.7;
+        }
+        .segment-card.segment-short {
+            border-right: 3px solid #e74c3c;
+        }
         
         .segment-header {
             display: flex;
@@ -965,19 +972,39 @@
             }
         }
         
+        function getInheritedText(segIndex) {
+            // Find the last non-empty text before this segment
+            for (let j = segIndex - 1; j >= 0; j--) {
+                const sv = selectedVariants[j];
+                if (sv && sv.text && sv.variant !== 'empty') {
+                    return sv.text;
+                }
+            }
+            return null;
+        }
+        
         function renderSegments() {
             const container = document.getElementById('segments-list');
-            container.innerHTML = segments.map((seg, i) => `
-                <div class="segment-card">
+            container.innerHTML = segments.map((seg, i) => {
+                const sv = selectedVariants[i];
+                const isEmpty = sv?.variant === 'empty' || (!sv?.text && sv?.custom === '');
+                const inherited = isEmpty ? getInheritedText(i) : null;
+                const duration = seg.end - seg.start;
+                const durationWarning = duration < 2.0;
+                
+                return `
+                <div class="segment-card${isEmpty ? ' segment-empty' : ''}${durationWarning ? ' segment-short' : ''}">
                     <div class="segment-header">
-                        <span class="segment-time">${formatTime(seg.start)} - ${formatTime(seg.end)}</span>
+                        <span class="segment-time">${formatTime(seg.start)} - ${formatTime(seg.end)} <small>(${duration.toFixed(1)}s)</small></span>
                         <img class="segment-thumbnail" src="${seg.thumbnail || '/api/placeholder/80/45'}" alt="">
                         <span class="segment-description">${seg.description || 'Kader ' + (i+1)}</span>
+                        ${durationWarning ? '<span style="color:#e74c3c;font-size:12px">⚠️ &lt;2s</span>' : ''}
                         <button class="edit-btn" onclick="toggleCustom(${i})">✏️ Uredi</button>
                     </div>
+                    ${inherited ? `<div style="padding:4px 12px;color:#888;font-style:italic;font-size:13px">↑ Podaljšan: "${inherited}"</div>` : ''}
                     <div class="variant-options">
                         ${['A', 'B', 'C'].map(v => `
-                            <div class="variant-option ${selectedVariants[i]?.variant === v ? 'selected' : ''}" 
+                            <div class="variant-option ${sv?.variant === v ? 'selected' : ''}" 
                                  onclick="selectVariant(${i}, '${v}', '${escapeHtml(seg.variants[v])}')">
                                 <div class="variant-label">Varianta ${v}</div>
                                 <div class="variant-text">${seg.variants[v]}</div>
@@ -985,10 +1012,11 @@
                         `).join('')}
                     </div>
                     <textarea class="custom-text" id="custom-${i}" 
-                              placeholder="Vpiši svoje besedilo..."
-                              onchange="setCustomText(${i}, this.value)">${selectedVariants[i]?.custom || ''}</textarea>
-                </div>
-            `).join('');
+                              placeholder="Vpiši svoje besedilo... (pusti prazno = podaljšaj prejšnjega)"
+                              onchange="setCustomText(${i}, this.value)"
+                              oninput="if(!this.value.trim()){setCustomText(${i}, '')}">${sv?.custom || ''}</textarea>
+                </div>`;
+            }).join('');
         }
         
         function formatTime(seconds) {
@@ -1002,7 +1030,7 @@
         }
         
         function selectVariant(segIndex, variant, text) {
-            selectedVariants[segIndex] = { variant, text };
+            selectedVariants[segIndex] = { variant, text, custom: '' };
             document.getElementById(`custom-${segIndex}`).classList.remove('visible');
             renderSegments();
         }
@@ -1018,7 +1046,11 @@
         function setCustomText(segIndex, text) {
             if (text.trim()) {
                 selectedVariants[segIndex] = { variant: 'custom', text: text.trim(), custom: text.trim() };
+            } else {
+                // Empty field — mark as cleared so processTexts extends previous text
+                selectedVariants[segIndex] = { variant: 'empty', text: '', custom: '' };
             }
+            renderSegments();
         }
         
         // Back button
@@ -1028,17 +1060,108 @@
             updateStepIndicator(1);
         });
         
+        // Process texts: handle empty fields (extend previous) and enforce min 2s duration
+        function processTexts(rawTexts) {
+            // Step 1: Handle empty fields — extend previous text until next non-empty
+            let processed = [];
+            let lastText = null;
+            let lastStart = null;
+            
+            for (let i = 0; i < rawTexts.length; i++) {
+                const t = rawTexts[i];
+                if (!t.text || t.text.trim() === '') {
+                    // Empty field — extend previous text's end to cover this segment
+                    if (lastText !== null && processed.length > 0) {
+                        processed[processed.length - 1].end = t.end;
+                    }
+                    // Skip this segment (don't add it)
+                } else {
+                    processed.push({ start: t.start, end: t.end, text: t.text });
+                    lastText = t.text;
+                }
+            }
+            
+            if (processed.length === 0) return processed;
+            
+            // Step 2: Enforce minimum 2 second duration
+            const MIN_DURATION = 2.0;
+            let needsRedistribution = true;
+            let maxIterations = 20;
+            
+            while (needsRedistribution && maxIterations-- > 0) {
+                needsRedistribution = false;
+                
+                // Find segments that are too short
+                for (let i = 0; i < processed.length; i++) {
+                    const duration = processed[i].end - processed[i].start;
+                    if (duration < MIN_DURATION) {
+                        const deficit = MIN_DURATION - duration;
+                        
+                        // Find longest segment to steal from
+                        let longestIdx = -1;
+                        let longestDur = 0;
+                        for (let j = 0; j < processed.length; j++) {
+                            if (j === i) continue;
+                            const d = processed[j].end - processed[j].start;
+                            if (d > longestDur && d > MIN_DURATION) {
+                                longestDur = d;
+                                longestIdx = j;
+                            }
+                        }
+                        
+                        if (longestIdx === -1) break; // No segment long enough to steal from
+                        
+                        // Calculate how much we can take (don't reduce below MIN_DURATION)
+                        const canTake = Math.min(deficit, longestDur - MIN_DURATION);
+                        if (canTake <= 0.1) continue;
+                        
+                        // Adjust times — shift boundaries
+                        if (longestIdx < i) {
+                            // Longest is before us — take from its end
+                            processed[longestIdx].end -= canTake;
+                            // Shift everything between longestIdx+1 and i back
+                            for (let k = longestIdx + 1; k <= i; k++) {
+                                processed[k].start -= canTake;
+                                if (k < i) processed[k].end -= canTake;
+                            }
+                        } else {
+                            // Longest is after us — take from its start
+                            processed[longestIdx].start += canTake;
+                            // Shift everything between i and longestIdx-1 forward
+                            for (let k = i; k < longestIdx; k++) {
+                                if (k > i) processed[k].start += canTake;
+                                processed[k].end += canTake;
+                            }
+                        }
+                        
+                        needsRedistribution = true;
+                        break; // Restart loop after redistribution
+                    }
+                }
+            }
+            
+            // Ensure no gaps between consecutive segments
+            for (let i = 1; i < processed.length; i++) {
+                if (Math.abs(processed[i].start - processed[i-1].end) < 0.01) {
+                    processed[i].start = processed[i-1].end;
+                }
+            }
+            
+            return processed;
+        }
+        
         // Preview
         document.getElementById('btn-preview').addEventListener('click', async () => {
             const videoClean = currentMode === 'clean' ? uploadedFilenames.single : uploadedFilenames.clean;
             const name = document.getElementById('video-name').value.trim();
             
-            // Build texts array
-            const texts = segments.map((seg, i) => ({
+            // Build texts array (with empty field handling + min 2s)
+            const rawTexts = segments.map((seg, i) => ({
                 start: seg.start,
                 end: seg.end,
-                text: selectedVariants[i].text
+                text: selectedVariants[i]?.text || ''
             }));
+            const texts = processTexts(rawTexts);
             
             // Show loading
             document.getElementById('variants-step').style.display = 'none';
@@ -1080,11 +1203,12 @@
             const videoClean = currentMode === 'clean' ? uploadedFilenames.single : uploadedFilenames.clean;
             const name = document.getElementById('video-name').value.trim();
             
-            const texts = segments.map((seg, i) => ({
+            const rawTexts = segments.map((seg, i) => ({
                 start: seg.start,
                 end: seg.end,
-                text: selectedVariants[i].text
+                text: selectedVariants[i]?.text || ''
             }));
+            const texts = processTexts(rawTexts);
             
             queue.push({
                 id: Date.now(),
@@ -1114,11 +1238,12 @@
             const videoClean = currentMode === 'clean' ? uploadedFilenames.single : uploadedFilenames.clean;
             const name = document.getElementById('video-name').value.trim();
             
-            const texts = segments.map((seg, i) => ({
+            const rawTexts = segments.map((seg, i) => ({
                 start: seg.start,
                 end: seg.end,
-                text: selectedVariants[i].text
+                text: selectedVariants[i]?.text || ''
             }));
+            const texts = processTexts(rawTexts);
             
             // Show loading
             document.getElementById('preview-step').style.display = 'none';
@@ -1286,10 +1411,25 @@
                 return;
             }
             
-            if (!confirm(`Generiraj ${queue.length} videov zdaj?`)) return;
+            // Only generate videos that have at least one text field with content
+            const readyItems = queue.filter(item => 
+                item.status === 'ready' && 
+                item.texts && item.texts.length > 0 &&
+                item.texts.some(t => t.text && t.text.trim())
+            );
             
-            for (const item of queue) {
-                if (item.status !== 'ready') continue;
+            if (readyItems.length === 0) {
+                alert('Nobeden video nima izpolnjenih tekstovnih polj!');
+                return;
+            }
+            
+            const skipped = queue.filter(item => item.status === 'ready').length - readyItems.length;
+            const msg = skipped > 0 
+                ? `Generiraj ${readyItems.length} videov zdaj? (${skipped} preskočenih — brez tekstov)` 
+                : `Generiraj ${readyItems.length} videov zdaj?`;
+            if (!confirm(msg)) return;
+            
+            for (const item of readyItems) {
                 
                 item.status = 'generating';
                 updateQueueDisplay();
