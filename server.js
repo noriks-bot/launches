@@ -633,6 +633,64 @@ Write ONLY the title in ${lang}, nothing else.`;
 });
 
 // Generate review for Social Proof Generator (frontend calls this)
+// Social proof used names tracking
+const USED_NAMES_FILE = path.join(__dirname, 'data', 'social-proof-names.json');
+
+function loadUsedNames() {
+    try {
+        return JSON.parse(fs.readFileSync(USED_NAMES_FILE, 'utf8'));
+    } catch { return {}; }
+}
+
+function saveUsedNames(data) {
+    const dir = path.dirname(USED_NAMES_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(USED_NAMES_FILE, JSON.stringify(data, null, 2));
+}
+
+app.post('/api/generate-name', async (req, res) => {
+    const { country, gender } = req.body;
+    
+    const countryNames = {
+        HR: 'Croatian', CZ: 'Czech', PL: 'Polish', GR: 'Greek', 
+        IT: 'Italian', HU: 'Hungarian', SK: 'Slovak'
+    };
+    const countryName = countryNames[country] || 'European';
+    const genderName = gender === 'female' ? 'female' : 'male';
+    
+    const usedNames = loadUsedNames();
+    const key = `${country}_${gender}`;
+    const used = usedNames[key] || [];
+    
+    const usedList = used.length > 0 ? `\n\nDO NOT use any of these names (already used):\n${used.join(', ')}` : '';
+    
+    try {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${OPENAI_API_KEY}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model: 'gpt-4o-mini',
+                messages: [{ role: 'user', content: `Generate a realistic ${genderName} first name and last name for a person from ${countryName}. The name should be common and authentic for that country. Return ONLY the full name (first last), nothing else.${usedList}` }],
+                max_tokens: 20,
+                temperature: 1.2
+            })
+        });
+        const data = await response.json();
+        const name = data.choices[0].message.content.trim().replace(/^["']|["']$/g, '');
+        
+        // Save to used names
+        if (!usedNames[key]) usedNames[key] = [];
+        usedNames[key].push(name);
+        // Keep last 120 names per country/gender (60 days * 2 per day)
+        if (usedNames[key].length > 120) usedNames[key] = usedNames[key].slice(-120);
+        saveUsedNames(usedNames);
+        
+        res.json({ name });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // Generate AI avatar for social proof
 app.post('/api/generate-avatar', async (req, res) => {
     const { country, gender } = req.body;
