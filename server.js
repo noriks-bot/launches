@@ -633,6 +633,52 @@ Write ONLY the title in ${lang}, nothing else.`;
 });
 
 // Generate review for Social Proof Generator (frontend calls this)
+// Generate AI avatar for social proof
+app.post('/api/generate-avatar', async (req, res) => {
+    const { country, gender } = req.body;
+    
+    const countryNames = {
+        HR: 'Croatian', CZ: 'Czech', PL: 'Polish', GR: 'Greek', 
+        IT: 'Italian', HU: 'Hungarian', SK: 'Slovak'
+    };
+    const countryName = countryNames[country] || 'European';
+    const genderName = gender === 'female' ? 'woman' : 'man';
+    const ageRange = gender === 'female' ? '25-40' : '25-45';
+    
+    const prompt = `A natural, casual Facebook profile photo of a ${countryName} ${genderName}, age ${ageRange}. The person looks like a typical ${countryName} person. Natural lighting, slightly blurry phone selfie quality, realistic and not too perfect. Head and shoulders only, plain or simple background. The photo should look like an authentic social media profile picture.`;
+    
+    try {
+        const response = await fetch('https://api.openai.com/v1/images/generations', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${OPENAI_API_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: 'dall-e-3',
+                prompt: prompt,
+                n: 1,
+                size: '1024x1024',
+                quality: 'standard',
+                response_format: 'url'
+            })
+        });
+        
+        const data = await response.json();
+        if (data.error) {
+            console.error('Avatar generation error:', data.error);
+            return res.status(500).json({ error: data.error.message });
+        }
+        
+        const imageUrl = data.data[0].url;
+        res.json({ url: imageUrl });
+        
+    } catch (err) {
+        console.error('Avatar generation error:', err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
 app.post('/api/generate-review', async (req, res) => {
     const { country, product, stars, style, isGift } = req.body;
     
@@ -4161,7 +4207,7 @@ function getProductTypeFromCode(code, name) {
 }
 // WooCommerce store credentials
 const wcStores = {
-    hr: { url: 'https://noriks.com/hr', ck: 'ck_d73881b20fd65125fb071414b8d54af7681549e3', cs: 'cs_e024298df41e4352d90e006d2ec42a5b341c1ce5' },
+    hr: { url: 'https://noriks.com/hr', ck: 'ck_ff08e90a8ff90be9f7fdfe7badfd4fdaa456d86b', cs: 'cs_0c36e01e44e488ae9d8a931b591a4d52584d975f' },
     cz: { url: 'https://noriks.com/cz', ck: 'ck_396d624acec5f7a46dfcfa7d2a74b95c82b38962', cs: 'cs_2a69c7ad4a4d118a2b8abdf44abdd058c9be9115' },
     pl: { url: 'https://noriks.com/pl', ck: 'ck_8fd83582ada887d0e586a04bf870d43634ca8f2c', cs: 'cs_f1bf98e46a3ae0623c5f2f9fcf7c2478240c5115' },
     sk: { url: 'https://noriks.com/sk', ck: 'ck_1abaeb006bb9039da0ad40f00ab674067ff1d978', cs: 'cs_32b33bc2716b07a738ff18eb377a767ef60edfe7' },

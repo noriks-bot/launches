@@ -68,7 +68,8 @@
           "notes": "",
           "deadline": "",
           "assignMessage": "",
-          "category": "it"
+          "category": "it",
+          "shortNote": "Mormo met to narejeno tako da če karkoli ni ok takoj sporoči."
         },
         {
           "id": "default-11",
@@ -76,7 +77,8 @@
           "done": false,
           "assignee": "",
           "notes": "",
-          "category": "it"
+          "category": "it",
+          "shortNote": "report, koliko in kaj. "
         },
         {
           "id": "default-5",
@@ -105,7 +107,7 @@
         {
           "id": "default-6",
           "name": "Call center (abandon)",
-          "done": true,
+          "done": false,
           "assignee": "",
           "notes": "",
           "category": "support"
@@ -113,15 +115,16 @@
         {
           "id": "default-7",
           "name": "Call center (stari kupci)",
-          "done": true,
+          "done": false,
           "assignee": "",
           "notes": "",
-          "category": "support"
+          "category": "support",
+          "shortNote": "starter pack naprej. "
         },
         {
           "id": "default-8",
           "name": "SMS abandon",
-          "done": true,
+          "done": false,
           "assignee": "",
           "notes": "",
           "category": "support"
@@ -140,7 +143,8 @@
           "done": false,
           "assignee": "",
           "notes": "",
-          "category": "support"
+          "category": "support",
+          "shortNote": "Rabimo koliko, jih je poklicala, koliko dobila in kakšen je profit in kakšne nagrade"
         },
         {
           "id": "default-13",
@@ -156,12 +160,13 @@
           "done": false,
           "assignee": "",
           "notes": "",
-          "category": "analytics"
+          "category": "analytics",
+          "shortNote": "neki se mi ne ujema med advertiser view in našim"
         },
         {
           "id": "default-19",
           "name": "Neprevzeti tracking",
-          "done": false,
+          "done": true,
           "assignee": "",
           "notes": "",
           "category": "analytics"
@@ -169,7 +174,7 @@
         {
           "id": "default-20",
           "name": "CR tracking",
-          "done": false,
+          "done": true,
           "assignee": "",
           "notes": "",
           "category": "analytics"
@@ -177,15 +182,7 @@
         {
           "id": "default-21",
           "name": "Checkout/nakupi ratio",
-          "done": false,
-          "assignee": "",
-          "notes": "",
-          "category": "analytics"
-        },
-        {
-          "id": "default-23",
-          "name": "Upsell report",
-          "done": false,
+          "done": true,
           "assignee": "",
           "notes": "",
           "category": "analytics"
@@ -277,7 +274,22 @@
         },
         {
           "id": "default-16",
+          "name": "YouTube objave",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "category": "other"
+        },
+        {
+          "id": "default-16",
           "name": "YouTube oglasi",
+          "done": false,
+          "assignee": "",
+          "notes": ""
+        },
+        {
+          "id": "default-23",
+          "name": "Upsell report",
           "done": false,
           "assignee": "",
           "notes": ""
@@ -285,37 +297,30 @@
       ],
       "customTasks": [
         {
-          "id": "custom-1771843614692",
-          "name": "Facebook struktura oglasov",
+          "id": "custom-1773836466691",
+          "name": "Zamenjaj slike boksaric da bodo prave",
+          "category": "it",
           "done": false,
           "assignee": "",
           "notes": "",
-          "isCustom": true,
-          "category": "analytics",
-          "deadline": "",
-          "assignMessage": ""
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836497428",
+          "name": "KODA NA MAILU.",
+          "category": "it",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "KO STRANKA HOČE IZKORISTIT KODO ZA POPUST, BI TA LAHKO BLA ŽE SAMA OD SEBE TAM VNEŠENA",
+          "link": "",
+          "isCustom": true
         },
         {
           "id": "custom-1771843619536",
           "name": "Marketplaci",
-          "done": false,
-          "assignee": "",
-          "notes": "",
-          "isCustom": true,
-          "category": "analytics"
-        },
-        {
-          "id": "custom-1771844000970",
-          "name": "Social proof na strani",
-          "done": false,
-          "assignee": "",
-          "notes": "",
-          "isCustom": true,
-          "category": "analytics"
-        },
-        {
-          "id": "custom-1771843993841",
-          "name": "Lokalizirane kreative",
           "done": false,
           "assignee": "",
           "notes": "",
@@ -331,6 +336,149 @@
           "isCustom": true,
           "category": "other",
           "shortNote": "Vsak dan ena angleška objava"
+        },
+        {
+          "id": "custom-1773836578992",
+          "name": "Flores",
+          "category": "marketing",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "Profit na kampaniji. Pogled kot država. delitev na vrsto kampanije, delitev na izdelek. pomočnik, ki pregleduje in predlaga.",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836662161",
+          "name": "Trustpilot",
+          "category": "support",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "Odgovori na vsakega. ",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836729989",
+          "name": "Novi landing pagi*",
+          "category": "it",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "!!!!",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836761590",
+          "name": "Rejection resolver",
+          "category": "support",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "Koliko je katere skupine, in kakšna je uspešnost. Implementacija znotraj appa whatsapp in mail. Kaseje avtomatika. ",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773837078779",
+          "name": "Video localizer",
+          "category": "kreativa",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "Uredi da bo vse kot mora biti. Dodajanje voice over in podnapisov",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773837110718",
+          "name": "Kreative cheker in uspešnost kreativ",
+          "category": "kreativa",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773837239580",
+          "name": "Določitev ciljev",
+          "category": "marketing",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773837408107",
+          "name": "Pregled kreativ",
+          "category": "kreativa",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "katere so prižgane, kakšen rezultat in koliko spenda na kreativi",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773838186973",
+          "name": "Analitika metakocka",
+          "category": "analytics",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "more bit povezano z metakocko, kar petra doda v metakocko more v strošek.",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773902039086",
+          "name": "MAILING",
+          "category": "marketing",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "Kdaj se pošilja, kakšen je profit. Če pošljemo offer 3+2 gratis se stranke pelje na ta offer*",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773996059329",
+          "name": "SMSI",
+          "category": "retention",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773996067145",
+          "name": "MAIL",
+          "category": "retention",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773996073680",
+          "name": "KLICANJE",
+          "category": "retention",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
         }
       ]
     },
@@ -549,6 +697,182 @@
           "notes": "",
           "isCustom": true,
           "category": "other"
+        },
+        {
+          "id": "custom-1773836466691",
+          "name": "Zamenjaj slike boksaric da bodo prave",
+          "category": "it",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836497428",
+          "name": "KODA NA MAILU.",
+          "category": "marketing",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836578992",
+          "name": "Flores",
+          "category": "marketing",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836662161",
+          "name": "Trustpilot",
+          "category": "support",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836682560",
+          "name": "Trustpilot",
+          "category": "it",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836729989",
+          "name": "Novi landing pagi*",
+          "category": "it",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836761590",
+          "name": "Rejection resolver",
+          "category": "support",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773837078779",
+          "name": "Video localizer",
+          "category": "kreativa",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773837110718",
+          "name": "Kreative cheker in uspešnost kreativ",
+          "category": "kreativa",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773837239580",
+          "name": "Določitev ciljev",
+          "category": "marketing",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773837408107",
+          "name": "Pregled kreativ",
+          "category": "kreativa",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773838186973",
+          "name": "Analitika metakocka",
+          "category": "analytics",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773902039086",
+          "name": "MAILING",
+          "category": "marketing",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773996059329",
+          "name": "SMSI",
+          "category": "retention",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773996067145",
+          "name": "MAIL",
+          "category": "retention",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773996073680",
+          "name": "KLICANJE",
+          "category": "retention",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
         }
       ]
     },
@@ -767,6 +1091,182 @@
           "notes": "",
           "isCustom": true,
           "category": "other"
+        },
+        {
+          "id": "custom-1773836466691",
+          "name": "Zamenjaj slike boksaric da bodo prave",
+          "category": "it",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836497428",
+          "name": "KODA NA MAILU.",
+          "category": "marketing",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836578992",
+          "name": "Flores",
+          "category": "marketing",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836662161",
+          "name": "Trustpilot",
+          "category": "support",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836682560",
+          "name": "Trustpilot",
+          "category": "it",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836729989",
+          "name": "Novi landing pagi*",
+          "category": "it",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836761590",
+          "name": "Rejection resolver",
+          "category": "support",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773837078779",
+          "name": "Video localizer",
+          "category": "kreativa",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773837110718",
+          "name": "Kreative cheker in uspešnost kreativ",
+          "category": "kreativa",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773837239580",
+          "name": "Določitev ciljev",
+          "category": "marketing",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773837408107",
+          "name": "Pregled kreativ",
+          "category": "kreativa",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773838186973",
+          "name": "Analitika metakocka",
+          "category": "analytics",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773902039086",
+          "name": "MAILING",
+          "category": "marketing",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773996059329",
+          "name": "SMSI",
+          "category": "retention",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773996067145",
+          "name": "MAIL",
+          "category": "retention",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773996073680",
+          "name": "KLICANJE",
+          "category": "retention",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
         }
       ]
     },
@@ -985,6 +1485,182 @@
           "notes": "",
           "isCustom": true,
           "category": "other"
+        },
+        {
+          "id": "custom-1773836466691",
+          "name": "Zamenjaj slike boksaric da bodo prave",
+          "category": "it",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836497428",
+          "name": "KODA NA MAILU.",
+          "category": "marketing",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836578992",
+          "name": "Flores",
+          "category": "marketing",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836662161",
+          "name": "Trustpilot",
+          "category": "support",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836682560",
+          "name": "Trustpilot",
+          "category": "it",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836729989",
+          "name": "Novi landing pagi*",
+          "category": "it",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836761590",
+          "name": "Rejection resolver",
+          "category": "support",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773837078779",
+          "name": "Video localizer",
+          "category": "kreativa",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773837110718",
+          "name": "Kreative cheker in uspešnost kreativ",
+          "category": "kreativa",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773837239580",
+          "name": "Določitev ciljev",
+          "category": "marketing",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773837408107",
+          "name": "Pregled kreativ",
+          "category": "kreativa",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773838186973",
+          "name": "Analitika metakocka",
+          "category": "analytics",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773902039086",
+          "name": "MAILING",
+          "category": "marketing",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773996059329",
+          "name": "SMSI",
+          "category": "retention",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773996067145",
+          "name": "MAIL",
+          "category": "retention",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773996073680",
+          "name": "KLICANJE",
+          "category": "retention",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
         }
       ]
     },
@@ -1203,6 +1879,182 @@
           "notes": "",
           "isCustom": true,
           "category": "other"
+        },
+        {
+          "id": "custom-1773836466691",
+          "name": "Zamenjaj slike boksaric da bodo prave",
+          "category": "it",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836497428",
+          "name": "KODA NA MAILU.",
+          "category": "marketing",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836578992",
+          "name": "Flores",
+          "category": "marketing",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836662161",
+          "name": "Trustpilot",
+          "category": "support",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836682560",
+          "name": "Trustpilot",
+          "category": "it",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836729989",
+          "name": "Novi landing pagi*",
+          "category": "it",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836761590",
+          "name": "Rejection resolver",
+          "category": "support",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773837078779",
+          "name": "Video localizer",
+          "category": "kreativa",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773837110718",
+          "name": "Kreative cheker in uspešnost kreativ",
+          "category": "kreativa",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773837239580",
+          "name": "Določitev ciljev",
+          "category": "marketing",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773837408107",
+          "name": "Pregled kreativ",
+          "category": "kreativa",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773838186973",
+          "name": "Analitika metakocka",
+          "category": "analytics",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773902039086",
+          "name": "MAILING",
+          "category": "marketing",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773996059329",
+          "name": "SMSI",
+          "category": "retention",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773996067145",
+          "name": "MAIL",
+          "category": "retention",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773996073680",
+          "name": "KLICANJE",
+          "category": "retention",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
         }
       ]
     },
@@ -1421,6 +2273,182 @@
           "notes": "",
           "isCustom": true,
           "category": "other"
+        },
+        {
+          "id": "custom-1773836466691",
+          "name": "Zamenjaj slike boksaric da bodo prave",
+          "category": "it",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836497428",
+          "name": "KODA NA MAILU.",
+          "category": "marketing",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836578992",
+          "name": "Flores",
+          "category": "marketing",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836662161",
+          "name": "Trustpilot",
+          "category": "support",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836682560",
+          "name": "Trustpilot",
+          "category": "it",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836729989",
+          "name": "Novi landing pagi*",
+          "category": "it",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836761590",
+          "name": "Rejection resolver",
+          "category": "support",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773837078779",
+          "name": "Video localizer",
+          "category": "kreativa",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773837110718",
+          "name": "Kreative cheker in uspešnost kreativ",
+          "category": "kreativa",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773837239580",
+          "name": "Določitev ciljev",
+          "category": "marketing",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773837408107",
+          "name": "Pregled kreativ",
+          "category": "kreativa",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773838186973",
+          "name": "Analitika metakocka",
+          "category": "analytics",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773902039086",
+          "name": "MAILING",
+          "category": "marketing",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773996059329",
+          "name": "SMSI",
+          "category": "retention",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773996067145",
+          "name": "MAIL",
+          "category": "retention",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773996073680",
+          "name": "KLICANJE",
+          "category": "retention",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
         }
       ]
     },
@@ -1639,6 +2667,182 @@
           "notes": "",
           "isCustom": true,
           "category": "other"
+        },
+        {
+          "id": "custom-1773836466691",
+          "name": "Zamenjaj slike boksaric da bodo prave",
+          "category": "it",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836497428",
+          "name": "KODA NA MAILU.",
+          "category": "marketing",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836578992",
+          "name": "Flores",
+          "category": "marketing",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836662161",
+          "name": "Trustpilot",
+          "category": "support",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836682560",
+          "name": "Trustpilot",
+          "category": "it",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836729989",
+          "name": "Novi landing pagi*",
+          "category": "it",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773836761590",
+          "name": "Rejection resolver",
+          "category": "support",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773837078779",
+          "name": "Video localizer",
+          "category": "kreativa",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773837110718",
+          "name": "Kreative cheker in uspešnost kreativ",
+          "category": "kreativa",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773837239580",
+          "name": "Določitev ciljev",
+          "category": "marketing",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773837408107",
+          "name": "Pregled kreativ",
+          "category": "kreativa",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773838186973",
+          "name": "Analitika metakocka",
+          "category": "analytics",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773902039086",
+          "name": "MAILING",
+          "category": "marketing",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773996059329",
+          "name": "SMSI",
+          "category": "retention",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773996067145",
+          "name": "MAIL",
+          "category": "retention",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
+        },
+        {
+          "id": "custom-1773996073680",
+          "name": "KLICANJE",
+          "category": "retention",
+          "done": false,
+          "assignee": "",
+          "notes": "",
+          "shortNote": "",
+          "link": "",
+          "isCustom": true
         }
       ]
     }
